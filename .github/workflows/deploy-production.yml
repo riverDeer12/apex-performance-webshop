@@ -1,0 +1,80 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - production
+  # Run by hand from the Actions tab, e.g. the first deploy.
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  SITE_NAME: shop.apex-performance.fit
+  DEPLOY_PATH: C:\inetpub\wwwroot\apex-performance-webshop\wwwroot
+  BUILD_OUTPUT: dist/apex-performance-webshop/browser
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, apex-performance-webshop]
+    # This environment requires manual approval before the job runs -
+    # configure a required reviewer under Settings > Environments > production
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (production config)
+        run: npm run production
+
+      - name: Write version.json
+        shell: powershell
+        run: |
+          $version = "${{ github.sha }}-$(Get-Date -Format o)"
+          $json = @{ version = $version } | ConvertTo-Json
+          Set-Content -Path (Join-Path "${{ env.BUILD_OUTPUT }}" "version.json") -Value $json
+
+      - name: Sync built files to IIS wwwroot
+        shell: cmd
+        run: |
+          robocopy "${{ env.BUILD_OUTPUT }}" "${{ env.DEPLOY_PATH }}" /MIR /R:3 /W:5
+          if %ERRORLEVEL% GEQ 8 exit /b 1
+          exit /b 0
+
+      - name: Verify deployed files are fresh
+        shell: powershell
+        run: |
+          $indexPath = Join-Path "${{ env.DEPLOY_PATH }}" "index.html"
+          $age = (Get-Date) - (Get-Item $indexPath).LastWriteTime
+          if ($age.TotalMinutes -gt 5) { throw "index.html was not updated by this deploy (last write $($age.TotalMinutes) minutes ago) - sync likely failed silently" }
+          Write-Host "index.html is fresh (updated $([math]::Round($age.TotalSeconds))s ago)"
+
+      - name: Health check
+        shell: powershell
+        run: |
+          $attempts = 5
+          for ($i = 1; $i -le $attempts; $i++) {
+            Start-Sleep -Seconds 3
+            try {
+              # An Angular route checks the web.config rewrite too, not just the start page.
+              foreach ($path in "/", "/health-check") {
+                $response = Invoke-WebRequest -Uri "https://${{ env.SITE_NAME }}$path" -UseBasicParsing -TimeoutSec 30
+                if ($response.StatusCode -ne 200) { throw "$path returned $($response.StatusCode)" }
+              }
+              Write-Host "Health check passed"
+              exit 0
+            } catch {
+              Write-Host "Attempt $i/$attempts failed: $($_.Exception.Message)"
+            }
+          }
+          throw "Health check failed after $attempts attempts"

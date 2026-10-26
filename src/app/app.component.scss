@@ -1,0 +1,33 @@
+.test-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 4px;
+  background: #f59e0b;
+  color: #1b1f29;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  z-index: 1000;
+}
+
+.coming-soon {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  text-align: center;
+
+  h1 {
+    color: #0034C4;
+    letter-spacing: 2px;
+    margin: 16px 0 8px;
+  }
+
+  a {
+    color: #0034C4;
+  }
+}
