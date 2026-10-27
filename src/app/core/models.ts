@@ -49,7 +49,7 @@ export interface PromoCheck {
     items: { variantId: string; unitDiscount: number }[];
 }
 
-export type OrderStatus = "Pending" | "Paid" | "Shipped" | "Cancelled";
+export type OrderStatus = "Pending" | "Paid" | "Shipped" | "Cancelled" | "Refunded";
 
 export interface Order {
     id: string;

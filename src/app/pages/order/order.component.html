@@ -21,6 +21,13 @@
           <a routerLink="/kosarica" class="button">Natrag u košaricu</a>
         </div>
       }
+      @case ('Refunded') {
+        <div class="center">
+          <h1>Narudžba {{ order.number }} je otkazana</h1>
+          <p class="muted">Novac je vraćen na vašu karticu. Banci obično treba 5–10 dana da se povrat pojavi na računu.</p>
+          <a routerLink="/" class="button secondary">Natrag u shop</a>
+        </div>
+      }
       @default {
         <div class="thanks">
           <div class="check" aria-hidden="true">✓</div>
