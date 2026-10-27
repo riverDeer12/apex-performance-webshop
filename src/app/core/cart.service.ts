@@ -3,6 +3,7 @@ import { CartItem, Locker } from "./models";
 
 const CartKey = "apex-shop-cart";
 const LockerKey = "apex-shop-locker";
+const PromoKey = "apex-shop-promo";
 export const MaxQuantity = 20;
 
 function read<T>(key: string, fallback: T): T {
@@ -31,6 +32,8 @@ function write(key: string, value: unknown): void {
 export class CartService {
     readonly items = signal<CartItem[]>(read<CartItem[]>(CartKey, []));
     readonly locker = signal<Locker | null>(read<Locker | null>(LockerKey, null));
+    // Promo code the customer applied, checked again in the cart and at checkout.
+    readonly promoCode = signal<string | null>(read<string | null>(PromoKey, null));
 
     readonly count = computed(() => this.items().reduce((sum, x) => sum + x.quantity, 0));
     readonly subtotal = computed(() => this.items().reduce((sum, x) => sum + x.price * x.quantity, 0));
@@ -38,6 +41,7 @@ export class CartService {
     constructor() {
         effect(() => write(CartKey, this.items()));
         effect(() => write(LockerKey, this.locker()));
+        effect(() => write(PromoKey, this.promoCode()));
     }
 
     add(item: Omit<CartItem, "quantity">, quantity: number): void {
@@ -63,5 +67,6 @@ export class CartService {
 
     clear(): void {
         this.items.set([]);
+        this.promoCode.set(null);
     }
 }

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, shareReplay } from "rxjs";
 import { environment } from "../../environments/environment";
-import { CartItem, Locker, Order, Product, ShopSettings } from "./models";
+import { CartItem, Locker, Order, Product, PromoCheck, ShopSettings } from "./models";
 
 /**
  * Shop part of the Apex Performance API. Prices and stock always come
@@ -28,12 +28,19 @@ export class ShopApiService {
         return (this.settings$ ??= this.http.get<ShopSettings>(this.url + "/settings").pipe(shareReplay(1)));
     }
 
-    checkout = (items: CartItem[], locker: Locker) =>
+    checkPromo = (code: string, items: CartItem[]) =>
+        this.http.post<PromoCheck>(this.url + "/promo-codes/check", {
+            code,
+            items: items.map((x) => ({ variantId: x.variantId, quantity: x.quantity })),
+        });
+
+    checkout = (items: CartItem[], locker: Locker, promoCode: string | null) =>
         this.http.post<{ orderId: string; checkoutUrl: string }>(this.url + "/checkout", {
             items: items.map((x) => ({ variantId: x.variantId, quantity: x.quantity })),
             boxNowLockerId: locker.id,
             boxNowLockerAddress: locker.address,
             boxNowLockerPostalCode: locker.postalCode,
+            promoCode,
         });
 
     getOrder = (id: string, sessionId: string) =>

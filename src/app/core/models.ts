@@ -41,6 +41,14 @@ export interface Locker {
     postalCode: string;
 }
 
+export interface PromoCheck {
+    code: string;
+    discountType: "Percent" | "Amount";
+    discountValue: number;
+    discount: number;
+    items: { variantId: string; unitDiscount: number }[];
+}
+
 export type OrderStatus = "Pending" | "Paid" | "Shipped" | "Cancelled";
 
 export interface Order {
@@ -50,11 +58,13 @@ export interface Order {
     customerName: string | null;
     customerEmail: string | null;
     subtotal: number;
+    promoCode: string | null;
+    discount: number;
     shippingPrice: number;
     total: number;
     boxNowLockerAddress: string;
     boxNowLockerPostalCode: string;
-    items: { productName: string; variantName: string | null; unitPrice: number; quantity: number }[];
+    items: { productName: string; variantName: string | null; unitPrice: number; unitDiscount: number; quantity: number }[];
 }
 
 export const variantName = (variant: Pick<Variant, "size" | "color">) =>
