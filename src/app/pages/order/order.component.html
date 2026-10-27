@@ -1,0 +1,64 @@
+<section class="container page">
+  @if (order(); as order) {
+    @switch (order.status) {
+      @case ('Pending') {
+        <div class="center">
+          @if (gaveUp()) {
+            <h1>Plaćanje još nije potvrđeno</h1>
+            <p class="muted">Ako ste platili, potvrdu ćete dobiti e-mailom u nekoliko minuta.
+              Ako ste odustali, proizvodi su i dalje u košarici.</p>
+            <a routerLink="/kosarica" class="button secondary">Natrag u košaricu</a>
+          } @else {
+            <div class="spinner" aria-hidden="true"></div>
+            <h1>Potvrđujemo plaćanje…</h1>
+          }
+        </div>
+      }
+      @case ('Cancelled') {
+        <div class="center">
+          <h1>Narudžba nije plaćena</h1>
+          <p class="muted">Plaćanje je isteklo ili je otkazano. Proizvodi su i dalje u košarici.</p>
+          <a routerLink="/kosarica" class="button">Natrag u košaricu</a>
+        </div>
+      }
+      @default {
+        <div class="thanks">
+          <div class="check" aria-hidden="true">✓</div>
+          <h1>Hvala na narudžbi!</h1>
+          <p>Narudžba <strong>{{ order.number }}</strong> je plaćena. Potvrda i fiskalizirani račun stižu na
+            <strong>{{ order.customerEmail }}</strong>.</p>
+        </div>
+
+        <div class="box">
+          <h2>Dostava</h2>
+          <p>BoxNow paketomat: <strong>{{ order.boxNowLockerAddress }}</strong>, {{ order.boxNowLockerPostalCode }}</p>
+          <p class="muted">Kad paket stigne u paketomat, BoxNow vam šalje poruku s kodom za otvaranje.</p>
+
+          <h2>Proizvodi</h2>
+          <table>
+            @for (item of order.items; track $index) {
+              <tr>
+                <td>{{ item.productName }}@if (item.variantName) {<span class="muted"> · {{ item.variantName }}</span>}</td>
+                <td class="qty">{{ item.quantity }} ×</td>
+                <td class="price">{{ formatPrice(item.unitPrice * item.quantity) }}</td>
+              </tr>
+            }
+            <tr class="sum"><td colspan="2">Dostava</td><td class="price">{{ formatPrice(order.shippingPrice) }}</td></tr>
+            <tr class="sum total"><td colspan="2">Ukupno</td><td class="price">{{ formatPrice(order.total) }}</td></tr>
+          </table>
+        </div>
+
+        <p class="center-text"><a routerLink="/" class="button secondary">Natrag u shop</a></p>
+      }
+    }
+  } @else if (notFound()) {
+    <div class="center">
+      <h1>Narudžba nije pronađena</h1>
+      <p class="muted">Ako ste platili, potvrda je stigla na vaš e-mail. Za pomoć pišite na
+        <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a>.</p>
+      <a routerLink="/" class="button">Natrag u shop</a>
+    </div>
+  } @else {
+    <div class="center"><div class="spinner" aria-hidden="true"></div></div>
+  }
+</section>

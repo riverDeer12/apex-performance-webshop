@@ -1,0 +1,93 @@
+<section class="container page">
+  <h1>Košarica</h1>
+
+  @if (cart.items().length === 0) {
+    <div class="empty">
+      <p class="muted">Košarica je prazna.</p>
+      <a routerLink="/" class="button">Pogledaj proizvode</a>
+    </div>
+  } @else {
+    <div class="layout">
+      <div>
+        <ul class="items">
+          @for (item of cart.items(); track item.variantId) {
+            <li class="item" [class.unavailable]="unavailable().has(item.variantId)">
+              <a [routerLink]="['/proizvod', item.slug]" class="thumb">
+                @if (item.imageId) {
+                  <img [src]="api.imageUrl(item.imageId)" [alt]="item.name">
+                }
+              </a>
+              <div class="info">
+                <a [routerLink]="['/proizvod', item.slug]" class="name">{{ item.name }}</a>
+                @if (item.variantName) {
+                  <span class="muted">{{ item.variantName }}</span>
+                }
+                @if (unavailable().has(item.variantId)) {
+                  <span class="warning">Više nije dostupno – uklonite iz košarice</span>
+                }
+                <div class="row">
+                  <div class="quantity">
+                    <button type="button" (click)="cart.setQuantity(item.variantId, item.quantity - 1)"
+                            aria-label="Manje">−</button>
+                    <span>{{ item.quantity }}</span>
+                    <button type="button" (click)="cart.setQuantity(item.variantId, item.quantity + 1)"
+                            [disabled]="item.quantity >= maxQuantity" aria-label="Više">+</button>
+                  </div>
+                  <span class="price">{{ formatPrice(item.price * item.quantity) }}</span>
+                </div>
+              </div>
+              <button type="button" class="remove" (click)="cart.remove(item.variantId)"
+                      [attr.aria-label]="'Ukloni ' + item.name">×</button>
+            </li>
+          }
+        </ul>
+
+        <div class="box">
+          <h2>BoxNow paketomat</h2>
+          @if (cart.locker(); as locker) {
+            @if (!choosingLocker()) {
+              <div class="locker">
+                <div>
+                  <strong>{{ locker.address }}</strong>
+                  <div class="muted">{{ locker.postalCode }}</div>
+                </div>
+                <button type="button" class="button secondary" (click)="changeLocker()">Promijeni</button>
+              </div>
+            }
+          }
+          @if (choosingLocker()) {
+            <p class="muted">Odaberite paketomat na karti. Kad paket stigne, BoxNow vam šalje kod za otvaranje.</p>
+            <div id="boxnowmap" class="map"></div>
+          }
+        </div>
+      </div>
+
+      <aside class="box summary">
+        <h2>Pregled</h2>
+        <div class="line"><span>Proizvodi</span><span class="price">{{ formatPrice(cart.subtotal()) }}</span></div>
+        <div class="line">
+          <span>Dostava</span>
+          <span class="price">
+            @if (shipping() === null) { … } @else if (shipping() === 0) { Besplatno } @else { {{ formatPrice(shipping()!) }} }
+          </span>
+        </div>
+        @if (missingForFree() > 0) {
+          <p class="free muted">Još {{ formatPrice(missingForFree()) }} do besplatne dostave.</p>
+        }
+        <div class="line total"><span>Ukupno</span><span class="price">{{ formatPrice(total()) }}</span></div>
+
+        @if (error()) {
+          <p class="notice error">{{ error() }}</p>
+        }
+        @if (!cart.locker()) {
+          <p class="muted hint">Za plaćanje odaberite paketomat.</p>
+        }
+
+        <button type="button" class="button wide" [disabled]="!canPay()" (click)="pay()">
+          {{ paying() ? 'Otvaram plaćanje…' : 'Plati karticom' }}
+        </button>
+        <p class="muted small">Plaćanje je na sigurnoj stranici Stripea. Fiskalizirani račun stiže na vaš e-mail.</p>
+      </aside>
+    </div>
+  }
+</section>

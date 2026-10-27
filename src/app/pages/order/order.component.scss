@@ -1,0 +1,89 @@
+.page {
+  max-width: 720px;
+  padding-top: 40px;
+}
+
+.center,
+.thanks,
+.center-text {
+  text-align: center;
+}
+
+.center {
+  padding: 32px 0;
+}
+
+h1 {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.check {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  font-size: 32px;
+  line-height: 64px;
+}
+
+.box {
+  margin: 24px 0;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--line);
+
+  h2 {
+    font-size: 13px;
+    margin: 8px 0;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .qty {
+    width: 48px;
+    text-align: center;
+  }
+
+  .price {
+    text-align: right;
+  }
+
+  .sum td {
+    border-bottom: 0;
+    padding: 4px 0;
+  }
+
+  .total td {
+    font-weight: 700;
+    font-size: 18px;
+    padding-top: 8px;
+  }
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 16px;
+  border: 4px solid var(--line);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

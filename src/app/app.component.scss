@@ -1,33 +1,106 @@
-.test-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: 4px;
-  background: #f59e0b;
-  color: #1b1f29;
-  font-weight: bold;
-  letter-spacing: 2px;
-  text-align: center;
-  z-index: 1000;
-}
-
-.coming-soon {
-  min-height: 100vh;
+:host {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 16px;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+.test-banner {
+  padding: 4px 16px;
+  background: #f59e0b;
+  color: #1b1f29;
+  font-size: 13px;
+  font-weight: 700;
   text-align: center;
+}
 
-  h1 {
-    color: #0034C4;
-    letter-spacing: 2px;
-    margin: 16px 0 8px;
-  }
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
 
-  a {
-    color: #0034C4;
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--heading);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+
+  b {
+    color: var(--blue);
+    font-weight: 400;
   }
+}
+
+.cart-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+
+  @media (max-width: 480px) {
+    span:not(.badge) {
+      display: none;
+    }
+  }
+}
+
+.badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 64px;
+  padding: 40px 0 24px;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+
+  h3 {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+}
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.legal {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
 }

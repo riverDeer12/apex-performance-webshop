@@ -1,6 +1,139 @@
+:root {
+  --blue: #0034c4;
+  --blue-dark: #00269a;
+  --ink: #12151c;
+  --muted: #5b6475;
+  --line: #e3e7ef;
+  --surface: #ffffff;
+  --background: #f5f7fb;
+  --danger: #c62828;
+  --success: #1a7f37;
+  --radius: 10px;
+  --heading: "Michroma", "Arial Black", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f2f5fc;
-  color: #1b1f29;
+  font-family: "Lato", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  background: var(--background);
+  color: var(--ink);
+}
+
+h1, h2, h3 {
+  font-family: var(--heading);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+a {
+  color: var(--blue);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--blue);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--blue-dark);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+
+    &:hover:not(:disabled) {
+      background: #fff;
+      border-color: var(--ink);
+    }
+  }
+
+  &.wide {
+    width: 100%;
+  }
+}
+
+.notice {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: #fff4e5;
+  border-left: 4px solid #f59e0b;
+
+  &.error {
+    background: #fdecec;
+    border-left-color: var(--danger);
+  }
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.price {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+// Shown while something loads, instead of a jumping layout.
+.skeleton {
+  background: linear-gradient(90deg, #eceff5 25%, #f6f8fb 50%, #eceff5 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.2s infinite;
+  border-radius: var(--radius);
+}
+
+@keyframes skeleton {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }

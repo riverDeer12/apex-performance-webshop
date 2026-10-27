@@ -1,0 +1,105 @@
+<section class="container page">
+  @if (product(); as product) {
+    <a routerLink="/" class="back">← Svi proizvodi</a>
+
+    <div class="layout">
+      <div class="gallery">
+        <div class="main-image">
+          @if (product.imageIds.length) {
+            <img [src]="api.imageUrl(product.imageIds[imageIndex()])" [alt]="product.name">
+          }
+        </div>
+        @if (product.imageIds.length > 1) {
+          <div class="thumbs">
+            @for (imageId of product.imageIds; track imageId; let i = $index) {
+              <button type="button" [class.active]="i === imageIndex()" (click)="imageIndex.set(i)"
+                      [attr.aria-label]="'Slika ' + (i + 1)">
+                <img [src]="api.imageUrl(imageId)" alt="" loading="lazy">
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="details">
+        <span class="muted">{{ product.category }}</span>
+        <h1>{{ product.name }}</h1>
+        <p class="price big">{{ formatPrice(product.price) }}</p>
+
+        @if (sizes().length > 0) {
+          <div class="option">
+            <span class="label">Veličina</span>
+            <div class="choices">
+              @for (item of sizes(); track item) {
+                <button type="button" [class.selected]="size() === item"
+                        [class.unavailable]="!available(item, color())" (click)="size.set(item)">{{ item }}</button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (colors().length > 0) {
+          <div class="option">
+            <span class="label">Boja</span>
+            <div class="choices">
+              @for (item of colors(); track item) {
+                <button type="button" [class.selected]="color() === item"
+                        [class.unavailable]="!available(size(), item)" (click)="color.set(item)">{{ item }}</button>
+              }
+            </div>
+          </div>
+        }
+
+        <p class="stock">
+          @if (variant(); as variant) {
+            @if (!variant.inStock) {
+              <span class="out">Trenutno nema na zalihi</span>
+            } @else if (variant.fewLeft) {
+              <span class="few">Još samo {{ variant.fewLeft }} kom.</span>
+            } @else {
+              <span class="in">Na zalihi</span>
+            }
+          } @else {
+            <span class="muted">Odaberite {{ sizes().length && !size() ? 'veličinu' : 'boju' }}.</span>
+          }
+        </p>
+
+        <div class="buy">
+          <div class="quantity" aria-label="Količina">
+            <button type="button" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1" aria-label="Manje">−</button>
+            <span>{{ quantity() }}</span>
+            <button type="button" (click)="changeQuantity(1)" [disabled]="quantity() >= maxQuantity" aria-label="Više">+</button>
+          </div>
+          <button type="button" class="button" [disabled]="!variant()?.inStock" (click)="addToCart()">
+            Dodaj u košaricu
+          </button>
+        </div>
+
+        @if (added()) {
+          <div class="added">
+            ✓ Dodano u košaricu. <a routerLink="/kosarica">Pogledaj košaricu</a>
+          </div>
+        }
+
+        <div class="description">{{ product.description }}</div>
+
+        <ul class="facts muted">
+          <li>Dostava u BoxNow paketomat</li>
+          <li>Plaćanje karticom preko Stripea</li>
+          <li>Povrat u 14 dana</li>
+        </ul>
+      </div>
+    </div>
+  } @else if (notFound()) {
+    <div class="center">
+      <h1>Proizvod nije pronađen</h1>
+      <p class="muted">Možda je rasprodan ili više nije u ponudi.</p>
+      <a routerLink="/" class="button">Natrag u shop</a>
+    </div>
+  } @else {
+    <div class="layout">
+      <div class="skeleton main-image"></div>
+      <div><div class="skeleton" style="height: 32px; width: 70%"></div></div>
+    </div>
+  }
+</section>

@@ -1,0 +1,50 @@
+<section class="hero">
+  <div class="container">
+    <p class="eyebrow">Apex Performance</p>
+    <h1>Treniraj u opremi<br>koju nosimo i mi.</h1>
+    <p class="lead">Odjeća i dodaci studija Apex Performance. Dostava u BoxNow paketomat diljem Hrvatske.</p>
+  </div>
+</section>
+
+<section class="container">
+  @if (categories().length > 1) {
+    <div class="filters" role="group" aria-label="Kategorije">
+      <button type="button" [class.active]="!category()" (click)="category.set(null)">Sve</button>
+      @for (item of categories(); track item) {
+        <button type="button" [class.active]="category() === item" (click)="category.set(item)">{{ item }}</button>
+      }
+    </div>
+  }
+
+  @if (failed()) {
+    <p class="notice error">Proizvodi se trenutno ne mogu učitati. Pokušajte ponovno za nekoliko minuta.</p>
+  } @else if (products() === null) {
+    <div class="grid">
+      @for (item of placeholders; track item) {
+        <div><div class="skeleton image"></div><div class="skeleton line"></div></div>
+      }
+    </div>
+  } @else if (visible().length === 0) {
+    <p class="empty muted">Prvi proizvodi stižu uskoro.</p>
+  } @else {
+    <div class="grid">
+      @for (product of visible(); track product.id) {
+        <a class="card" [routerLink]="['/proizvod', product.slug]">
+          <div class="image">
+            @if (product.imageIds.length) {
+              <img [src]="api.imageUrl(product.imageIds[0])" [alt]="product.name" loading="lazy">
+            }
+            @if (soldOut(product)) {
+              <span class="tag">Rasprodano</span>
+            }
+          </div>
+          <div class="card-body">
+            <span class="muted category">{{ product.category }}</span>
+            <span class="name">{{ product.name }}</span>
+            <span class="price">{{ formatPrice(product.price) }}</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</section>

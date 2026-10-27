@@ -1,11 +1,49 @@
 @if (isTest) {
-  <div class="test-banner">TEST</div>
+  <div class="test-banner">TEST · plaćanje testnim karticama, npr. 4242 4242 4242 4242</div>
 }
 
-<main class="coming-soon">
-  <img src="logo.png" width="160" alt="Apex Performance">
-  <h1>APEX PERFORMANCE SHOP</h1>
-  <p>Uskoro. Do tada nas posjetite na <a href="https://apex-performance.fit">apex-performance.fit</a>.</p>
+<header class="header">
+  <div class="container header-inner">
+    <a routerLink="/" class="logo" aria-label="Apex Performance Shop">
+      <img src="logo.png" width="56" height="25" alt="">
+      <span>APEX <b>SHOP</b></span>
+    </a>
+    <a routerLink="/kosarica" class="cart-link" aria-label="Košarica">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/>
+      </svg>
+      <span>Košarica</span>
+      @if (cart.count() > 0) {
+        <span class="badge">{{ cart.count() }}</span>
+      }
+    </a>
+  </div>
+</header>
+
+<main>
+  <router-outlet />
 </main>
 
-<router-outlet />
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <img src="logo.png" width="72" height="32" alt="Apex Performance">
+      <p class="muted">Odjeća i oprema studija Apex Performance.</p>
+    </div>
+    <div>
+      <h3>Dostava</h3>
+      <p class="muted">BoxNow paketomati diljem Hrvatske. Plaćanje karticom preko Stripea, fiskalizirani račun stiže e-mailom.</p>
+    </div>
+    <div>
+      <h3>Kontakt</h3>
+      <p class="muted">
+        <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a><br>
+        <a href="https://apex-performance.fit">apex-performance.fit</a>
+      </p>
+    </div>
+  </div>
+  <div class="container legal muted">
+    © {{ year }} Apex Performance, obrt za usluge, vl. Gabriel Mihelčić · Trtni 21, Mladenići, Viškovo · OIB 81729432712
+  </div>
+</footer>
