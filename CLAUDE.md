@@ -3,6 +3,20 @@
 Angular 19 webshop for Apex Performance.
 Production: https://shop.apex-performance.fit — Test: https://test.shop.apex-performance.fit
 
+## Before the first release to shop.apex-performance.fit
+
+shop.apex-performance.fit still shows the "uskoro" (coming soon) page; the shop runs only on test. Before
+anything is pushed to `production` for the first time, remind the owner of these and ask them to confirm
+each one is done (don't release on your own):
+
+1. Stripe account of Apex Performance (the obrt) is open, connected to eRačuni, and its live keys plus the
+   webhook signing secret are on the production API (`Stripe:ApexPerformance:SecretKey`, `...:WebhookSecret`).
+2. BoxNow contract for Apex Performance, its settings on the production API (`BoxNow:ApexPerformance:*`).
+3. A lawyer has checked the legal pages (Opći uvjeti, Povrat i reklamacije, Privatnost).
+4. The accountant confirmed the obrt has online retail (trgovina putem interneta) registered.
+5. Products, stock and shop settings entered in the production administration (its database is separate).
+6. The `production` GitHub Environment of this repo requires the owner's approval.
+
 ## Branches
 
 - `production` — the working branch. Make changes here.
