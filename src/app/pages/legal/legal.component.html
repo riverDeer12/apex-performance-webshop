@@ -1,0 +1,176 @@
+<section class="container page">
+  @if (isTest) {
+    <p class="notice">Nacrt teksta – prije objave na shop.apex-performance.fit treba ga provjeriti odvjetnik.</p>
+  }
+
+  @switch (page) {
+    @case ('terms') {
+      <h1>Opći uvjeti kupnje</h1>
+      <p class="muted">Vrijede od {{ updated }}</p>
+
+      <h2>1. Prodavatelj</h2>
+      <p>Prodavatelj u Apex Performance Shopu ({{ shopUrl.replace('https://', '') }}) je
+        <strong>Apex Performance, obrt za usluge, vl. Gabriel Mihelčić</strong>, Trtni 21, Mladenići, 51216 Viškovo,
+        OIB 81729432712 (u daljnjem tekstu: prodavatelj).<br>
+        E-mail: <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a>,
+        telefon: <a href="tel:+385993544895">+385 99 354 4895</a>.</p>
+
+      <h2>2. Primjena uvjeta</h2>
+      <p>Ovi uvjeti vrijede za sve kupnje u shopu. Narudžbom kupac potvrđuje da ih je pročitao i da ih prihvaća.
+        Na odnose koji nisu uređeni ovim uvjetima primjenjuju se propisi Republike Hrvatske, osobito Zakon o
+        zaštiti potrošača i Zakon o obveznim odnosima.</p>
+
+      <h2>3. Proizvodi i cijene</h2>
+      <p>Uz svaki proizvod navedeni su njegova svojstva, dostupne veličine i boje te cijena. Fotografije su
+        informativne; nijansa boje može se neznatno razlikovati zbog prikaza na zaslonu.</p>
+      <p>Cijene su izražene u eurima (€) i konačne su. <strong>Prodavatelj nije u sustavu PDV-a</strong>, pa PDV
+        nije obračunat (čl. 90. st. 1. Zakona o porezu na dodanu vrijednost). Cijena dostave prikazana je u košarici
+        prije plaćanja.</p>
+      <p>Popusti (promo kodovi i popust za klijente studija) ne zbrajaju se: za svaki proizvod vrijedi veći popust.</p>
+
+      <h2>4. Narudžba i sklapanje ugovora</h2>
+      <p>Kupac odabire proizvode, BoxNow paketomat za dostavu i plaća karticom. Ugovor je sklopljen kad je plaćanje
+        uspješno; kupac tada na e-mail dobiva potvrdu narudžbe. Ako proizvoda u međuvremenu nestane na zalihi,
+        prodavatelj kupca obavještava i vraća plaćeni iznos.</p>
+
+      <h2>5. Plaćanje i račun</h2>
+      <p>Plaća se karticom na sigurnoj stranici platnog servisa <strong>Stripe</strong>. Prodavatelj ne vidi i ne
+        sprema podatke o kartici. Fiskalizirani račun kupac dobiva e-mailom na adresu upisanu pri plaćanju.</p>
+
+      <h2>6. Dostava</h2>
+      <p>Dostava se obavlja putem <strong>BoxNow paketomata</strong> na području Republike Hrvatske.
+        @if (settings(); as settings) {
+          Dostava stoji {{ formatPrice(settings.shippingPrice) }}, a besplatna je za narudžbe od
+          {{ formatPrice(settings.freeShippingFrom) }} (iznos proizvoda nakon popusta).
+        }
+        Narudžbu u pravilu šaljemo u roku od 3 radna dana od plaćanja. Kad paket stigne u paketomat, BoxNow kupcu
+        šalje poruku s kodom za otvaranje. Paket treba preuzeti u roku koji navede BoxNow; nepreuzeti paket vraća se
+        prodavatelju, a kupcu se vraća plaćeni iznos umanjen za troškove dostave.</p>
+
+      <h2>7. Povrat i reklamacije</h2>
+      <p>Kupac-potrošač ima pravo na jednostrani raskid ugovora u roku od 14 dana, bez navođenja razloga, a prodavatelj
+        odgovara za materijalne nedostatke proizvoda. Postupak je opisan na stranici
+        <a routerLink="/povrat-i-reklamacije">Povrat i reklamacije</a>, gdje se nalazi i obrazac za jednostrani raskid.</p>
+
+      <h2>8. Korisnički račun</h2>
+      <p>Klijenti studija Apex Performance mogu se prijaviti računom iz aplikacije Apex Performance i ostvariti popust
+        za klijente. Za kupnju prijava nije potrebna.</p>
+
+      <h2>9. Osobni podaci</h2>
+      <p>Osobne podatke obrađujemo samo za izvršenje narudžbe i zakonske obveze, kako je opisano na stranici
+        <a routerLink="/privatnost">Privatnost i kolačići</a>.</p>
+
+      <h2>10. Prigovori i sporovi</h2>
+      <p>Prigovor se podnosi pisano, na <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a>
+        ili na adresu prodavatelja. Prodavatelj potvrđuje primitak prigovora i odgovara na njega u roku od 15 dana od
+        primitka. Spor se može pokušati riješiti i pred tijelom za alternativno rješavanje potrošačkih sporova; o
+        sudjelovanju u takvom postupku prodavatelj odlučuje u svakom pojedinom slučaju. Za sporove je nadležan stvarno
+        nadležan sud u Rijeci, osim ako zakon za potrošača ne određuje drukčije.</p>
+    }
+
+    @case ('returns') {
+      <h1>Povrat i reklamacije</h1>
+      <p class="muted">Vrijedi od {{ updated }}</p>
+
+      <h2>Pravo na jednostrani raskid ugovora</h2>
+      <p>Kao potrošač imate pravo bez navođenja razloga jednostrano raskinuti ugovor u roku od
+        <strong>14 dana</strong> od dana kad ste vi (ili osoba koju ste odredili, a nije prijevoznik) preuzeli proizvod.</p>
+      <p>Za raskid nam pošaljite jasnu izjavu o raskidu, na primjer e-mailom na
+        <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a> ili poštom na adresu
+        Apex Performance, Trtni 21, Mladenići, 51216 Viškovo. Možete koristiti <a href="#obrazac">obrazac ispod</a>,
+        ali to nije obvezno. Rok je poštovan ako izjavu pošaljete prije nego istekne 14 dana.</p>
+
+      <h3>Vraćanje proizvoda</h3>
+      <p>Proizvode nam vratite bez odgađanja, a najkasnije 14 dana od dana kad ste nam poslali izjavu o raskidu, na
+        adresu prodavatelja ili kako se dogovorimo (npr. preko BoxNow paketomata). <strong>Izravne troškove povrata
+        snosite vi.</strong> Proizvod vratite neoštećen, s etiketama i po mogućnosti u originalnom pakiranju. Odgovarate
+        za umanjenu vrijednost proizvoda ako je nastala zbog rukovanja koje nije bilo nužno da biste utvrdili njegovu
+        prirodu, svojstva i funkcioniranje (npr. nošenje odjeće, pranje).</p>
+
+      <h3>Povrat novca</h3>
+      <p>Vratit ćemo vam sve što ste platili, uključujući osnovnu cijenu dostave, najkasnije 14 dana od dana kad
+        primimo vašu izjavu o raskidu. Novac vraćamo na karticu kojom ste platili, bez naknade. Povrat možemo zadržati
+        dok ne primimo proizvode ili dok nam ne dostavite dokaz da ste ih poslali, ovisno o tome što je ranije.</p>
+
+      <h3>Iznimke</h3>
+      <p>Pravo na raskid nemate za zapečaćene proizvode koji nisu prikladni za vraćanje zbog zaštite zdravlja ili
+        higijene, ako ste ih otpečatili nakon isporuke, ni za proizvode izrađene po vašim uputama (npr. personalizirane).</p>
+
+      <h2>Reklamacije (materijalni nedostaci)</h2>
+      <p>Prodavatelj odgovara za materijalne nedostatke proizvoda u skladu sa Zakonom o obveznim odnosima. Nedostatak
+        prijavite e-mailom na <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a> što
+        prije, a najkasnije u roku od dva mjeseca od kad ste ga otkrili, uz broj narudžbe i fotografiju nedostatka.
+        Prodavatelj odgovara za nedostatke koji se pokažu u roku od dvije godine od preuzimanja proizvoda. Na pisanu
+        reklamaciju odgovaramo u roku od 15 dana; ovisno o nedostatku proizvod ćemo popraviti, zamijeniti, sniziti mu
+        cijenu ili vratiti novac.</p>
+
+      <h2 id="obrazac">Obrazac za jednostrani raskid ugovora</h2>
+      <p class="muted">Ispunite i pošaljite ovaj obrazac samo ako želite raskinuti ugovor. Možete ga ispisati ili
+        prepisati u e-mail.</p>
+      <div class="form-sheet">
+        <p><strong>Prima:</strong> Apex Performance, obrt za usluge, vl. Gabriel Mihelčić, Trtni 21, Mladenići,
+          51216 Viškovo, OIB 81729432712, gabriel&#64;apex-performance.fit</p>
+        <p>Ovim izjavljujem da jednostrano raskidam ugovor o kupnji sljedećih proizvoda:</p>
+        <p class="line">Proizvodi (naziv, veličina/boja, količina):</p>
+        <p class="line">Broj narudžbe:</p>
+        <p class="line">Naručeno dana / primljeno dana:</p>
+        <p class="line">Ime i prezime potrošača:</p>
+        <p class="line">Adresa potrošača:</p>
+        <p class="line">E-mail i telefon:</p>
+        <p class="line">Potpis potrošača (samo ako se obrazac šalje na papiru):</p>
+        <p class="line">Datum:</p>
+      </div>
+      <button type="button" class="button secondary no-print" (click)="print()">Ispiši obrazac</button>
+    }
+
+    @case ('privacy') {
+      <h1>Privatnost i kolačići</h1>
+      <p class="muted">Vrijedi od {{ updated }}</p>
+
+      <h2>Voditelj obrade</h2>
+      <p>Apex Performance, obrt za usluge, vl. Gabriel Mihelčić, Trtni 21, Mladenići, 51216 Viškovo,
+        OIB 81729432712. Za sva pitanja o osobnim podacima:
+        <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a>.</p>
+
+      <h2>Koje podatke obrađujemo i zašto</h2>
+      <ul>
+        <li><strong>Narudžba:</strong> ime i prezime, e-mail, telefon i adresa za račun (upisujete ih na stranici
+          plaćanja Stripe), odabrani BoxNow paketomat i naručeni proizvodi. Svrha: izvršenje ugovora – plaćanje,
+          dostava i račun (čl. 6. st. 1. b) Opće uredbe o zaštiti podataka).</li>
+        <li><strong>Račun i knjigovodstvo:</strong> podaci s računa, radi zakonskih obveza (čl. 6. st. 1. c)).</li>
+        <li><strong>Prijava u shop:</strong> klijenti studija prijavljuju se računom iz aplikacije Apex Performance;
+          u shopu koristimo ime i e-mail s tog računa te popis vaših narudžbi.</li>
+        <li><strong>„Javi mi kad bude dostupno“:</strong> e-mail adresa, samo da vam jednom javimo da je proizvod
+          ponovno na zalihi (na temelju vašeg zahtjeva, čl. 6. st. 1. a)). Adresu brišemo najkasnije nakon 6 mjeseci.</li>
+        <li><strong>Pitanja i reklamacije:</strong> podaci koje nam pošaljete e-mailom.</li>
+      </ul>
+
+      <h2>Kome podatke prosljeđujemo</h2>
+      <ul>
+        <li><strong>Stripe Payments Europe, Ltd.</strong> – plaćanje karticom (Stripe je samostalno odgovoran za podatke
+          o kartici);</li>
+        <li><strong>BoxNow</strong> – dostava u paketomat (ime, e-mail, telefon, paketomat);</li>
+        <li><strong>eRačuni</strong> – izdavanje i fiskalizacija računa te njegovo slanje e-mailom;</li>
+        <li>pružatelji usluga poslužitelja i e-pošte koje koristimo za rad shopa.</li>
+      </ul>
+      <p>Podatke ne prodajemo i ne koristimo za oglašavanje.</p>
+
+      <h2>Koliko dugo čuvamo podatke</h2>
+      <p>Podatke o narudžbama i računima čuvamo onoliko koliko propisuju porezni i računovodstveni propisi (u pravilu
+        11 godina), ostale podatke dok su potrebni za svrhu zbog koje su prikupljeni.</p>
+
+      <h2>Vaša prava</h2>
+      <p>Imate pravo na pristup svojim podacima, ispravak, brisanje, ograničenje obrade, prenosivost i prigovor, te
+        pravo povući privolu. Zahtjev pošaljite na
+        <a href="mailto:gabriel@apex-performance.fit">gabriel&#64;apex-performance.fit</a>. Pritužbu možete podnijeti
+        Agenciji za zaštitu osobnih podataka (<a href="https://azop.hr" rel="noopener" target="_blank">azop.hr</a>).</p>
+
+      <h2>Kolačići i podaci u pregledniku</h2>
+      <p>Shop <strong>ne koristi kolačiće za praćenje ni oglašavanje</strong>. U vašem pregledniku (localStorage)
+        sprema samo ono što je potrebno za rad: sadržaj košarice, odabrani paketomat, upisani promo kod i prijavu.
+        Posjete brojimo samo po stranici i danu, bez ikakvih podataka o posjetitelju.</p>
+      <p>Kad otvorite košaricu, karta paketomata učitava se s poslužitelja BoxNowa, a plaćanje se odvija na stranici
+        Stripea; ti servisi mogu na svojim stranicama koristiti vlastite kolačiće prema svojim pravilima.</p>
+    }
+  }
+</section>

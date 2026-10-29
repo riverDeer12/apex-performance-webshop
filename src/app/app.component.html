@@ -8,6 +8,24 @@
       <img src="logo.png" width="56" height="25" alt="">
       <span>APEX <b>SHOP</b></span>
     </a>
+    <nav class="nav">
+    @if (account.me(); as me) {
+      <a routerLink="/moje-narudzbe" class="account-link" [attr.aria-label]="'Moje narudžbe, ' + me.name">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+        <span>{{ me.name.split(' ')[0] }}</span>
+      </a>
+    } @else {
+      <a routerLink="/prijava" class="account-link">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+        <span>Prijava</span>
+      </a>
+    }
     <a routerLink="/kosarica" class="cart-link" aria-label="Košarica">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -18,6 +36,7 @@
         <span class="badge">{{ cart.count() }}</span>
       }
     </a>
+    </nav>
   </div>
 </header>
 
@@ -42,6 +61,11 @@
         <a href="https://apex-performance.fit">apex-performance.fit</a>
       </p>
     </div>
+  </div>
+  <div class="container legal-links">
+    <a routerLink="/uvjeti-kupnje">Opći uvjeti kupnje</a>
+    <a routerLink="/povrat-i-reklamacije">Povrat i reklamacije</a>
+    <a routerLink="/privatnost">Privatnost i kolačići</a>
   </div>
   <div class="container legal muted">
     © {{ year }} Apex Performance, obrt za usluge, vl. Gabriel Mihelčić · Trtni 21, Mladenići, Viškovo · OIB 81729432712

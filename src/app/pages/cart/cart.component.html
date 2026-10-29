@@ -34,10 +34,10 @@
                             [disabled]="item.quantity >= maxQuantity" aria-label="Više">+</button>
                   </div>
                   <span class="price">
-                    @if (discountOf(item.variantId) > 0) {
+                    @if (discountOf(item) > 0) {
                       <s class="muted old">{{ formatPrice(item.price * item.quantity) }}</s>
                     }
-                    {{ formatPrice((item.price - discountOf(item.variantId)) * item.quantity) }}
+                    {{ formatPrice((item.price - discountOf(item)) * item.quantity) }}
                   </span>
                 </div>
               </div>
@@ -70,10 +70,13 @@
       <aside class="box summary">
         <h2>Pregled</h2>
         <div class="line"><span>Proizvodi</span><span class="price">{{ formatPrice(cart.subtotal()) }}</span></div>
-        @if (promo(); as promo) {
+        @if (discount() > 0) {
           <div class="line discount">
-            <span>Promo kod <b>{{ promo.code }}</b>
-              <button type="button" class="link" (click)="removePromo()">ukloni</button></span>
+            <span>{{ discountName() }}
+              @if (promo()) {
+                <button type="button" class="link" (click)="removePromo()">ukloni kod</button>
+              }
+            </span>
             <span class="price">−{{ formatPrice(discount()) }}</span>
           </div>
         }
@@ -108,9 +111,19 @@
           <p class="muted hint">Za plaćanje odaberite paketomat.</p>
         }
 
+        <label class="consent">
+          <input type="checkbox" [checked]="accepted()" (change)="accepted.set($any($event.target).checked)">
+          <span>Pročitao/la sam i prihvaćam <a routerLink="/uvjeti-kupnje" target="_blank">Opće uvjete kupnje</a> i
+            upoznat/a sam s <a routerLink="/povrat-i-reklamacije" target="_blank">pravom na jednostrani raskid</a>.</span>
+        </label>
+
         <button type="button" class="button wide" [disabled]="!canPay()" (click)="pay()">
-          {{ paying() ? 'Otvaram plaćanje…' : 'Plati karticom' }}
+          {{ paying() ? 'Otvaram plaćanje…' : 'Naruči i plati karticom' }}
         </button>
+        @if (!account.isLoggedIn()) {
+          <p class="muted small">Klijent studija? <a routerLink="/prijava" [queryParams]="{ povratak: '/kosarica' }">Prijavite se</a>
+            za popust za klijente.</p>
+        }
         <p class="muted small">Plaćanje je na sigurnoj stranici Stripea. Fiskalizirani račun stiže na vaš e-mail.</p>
       </aside>
     </div>

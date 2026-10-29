@@ -2,7 +2,7 @@ import { Component, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ShopApiService } from '../../core/shop-api.service';
 import { CartService } from '../../core/cart.service';
-import { Order, formatPrice } from '../../core/models';
+import { Order, discountLabel, formatPrice } from '../../core/models';
 
 // Stripe can take a moment to mark the payment done.
 const RetryEveryMs = 2000;
@@ -24,6 +24,7 @@ export class OrderComponent implements OnDestroy {
   readonly gaveUp = signal(false);
 
   readonly formatPrice = formatPrice;
+  readonly discountLabel = discountLabel;
 
   private retries = 0;
   private timer?: ReturnType<typeof setTimeout>;

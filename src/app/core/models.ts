@@ -23,6 +23,15 @@ export interface ShopSettings {
     shippingPrice: number;
     freeShippingFrom: number;
     boxNowPartnerId: string | null;
+    // Off every product for clients of the studio logged in to the shop, 0 for none.
+    clientDiscountPercent: number;
+}
+
+export interface ShopMe {
+    name: string;
+    email: string;
+    isClient: boolean;
+    clientDiscountPercent: number;
 }
 
 export interface CartItem {
@@ -60,8 +69,13 @@ export interface Order {
     subtotal: number;
     promoCode: string | null;
     discount: number;
+    clientDiscountPercent: number | null;
     shippingPrice: number;
     total: number;
+    createdAt: string;
+    paidAt: string | null;
+    shippedAt: string | null;
+    boxNowParcelId: string | null;
     boxNowLockerAddress: string;
     boxNowLockerPostalCode: string;
     items: { productName: string; variantName: string | null; unitPrice: number; unitDiscount: number; quantity: number }[];
@@ -73,3 +87,16 @@ export const variantName = (variant: Pick<Variant, "size" | "color">) =>
 // "12,50 €", as prices are written in Croatia.
 export const formatPrice = (value: number) =>
     value.toLocaleString("hr-HR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+
+// Client discount on one piece, rounded to cents like the API does.
+export const clientUnitDiscount = (percent: number, price: number) =>
+    percent > 0 ? Math.min(price, Math.round(price * percent) / 100) : 0;
+
+// What an order's discount was, e.g. "Promo kod APEX10" or "Popust za klijente 10 %".
+export function discountLabel(order: Pick<Order, "promoCode" | "clientDiscountPercent">): string {
+    const client = order.clientDiscountPercent ? `popust za klijente ${order.clientDiscountPercent} %` : "";
+    const promo = order.promoCode ? `promo kod ${order.promoCode}` : "";
+    const text = [promo, client].filter(Boolean).join(" i ") || "popust";
+
+    return text[0].toUpperCase() + text.slice(1);
+}

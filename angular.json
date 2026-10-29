@@ -57,6 +57,12 @@
               }
             ],
             "styles": [
+              "node_modules/@fontsource/lato/latin-400.css",
+              "node_modules/@fontsource/lato/latin-ext-400.css",
+              "node_modules/@fontsource/lato/latin-700.css",
+              "node_modules/@fontsource/lato/latin-ext-700.css",
+              "node_modules/@fontsource/michroma/latin-400.css",
+              "node_modules/@fontsource/michroma/latin-ext-400.css",
               "src/styles.scss"
             ],
             "scripts": []

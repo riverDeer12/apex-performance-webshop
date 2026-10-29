@@ -235,3 +235,19 @@
   color: var(--danger);
   font-size: 14px;
 }
+
+.consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0 0 12px;
+  font-size: 14px;
+
+  input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 1px 0 0;
+    accent-color: var(--blue);
+  }
+}

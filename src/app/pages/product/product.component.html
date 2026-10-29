@@ -24,7 +24,15 @@
       <div class="details">
         <span class="muted">{{ product.category }}</span>
         <h1>{{ product.name }}</h1>
-        <p class="price big">{{ formatPrice(product.price) }}</p>
+        @if (clientPrice(); as clientPrice) {
+          <p class="price big">
+            <s class="muted old">{{ formatPrice(product.price) }}</s>
+            {{ formatPrice(clientPrice) }}
+            <span class="client-tag">cijena za klijente</span>
+          </p>
+        } @else {
+          <p class="price big">{{ formatPrice(product.price) }}</p>
+        }
 
         @if (sizes().length > 0) {
           <div class="option">
@@ -75,6 +83,30 @@
           </button>
         </div>
 
+        @if (variant(); as variant) {
+          @if (!variant.inStock) {
+            <div class="alert-box">
+              @if (alertState() === 'sent') {
+                <p><strong>Javit ćemo vam!</strong> Kad bude ponovno na zalihi, stiže vam jedan e-mail.</p>
+              } @else {
+                <form (submit)="$event.preventDefault(); requestAlert()">
+                  <label for="alertEmail">Javi mi kad bude dostupno</label>
+                  <div class="alert-row">
+                    <input id="alertEmail" type="email" placeholder="vaš e-mail" autocomplete="email" required
+                           [value]="alertEmail()" (input)="alertEmail.set($any($event.target).value)">
+                    <button type="submit" class="button secondary"
+                            [disabled]="!alertEmail().trim() || alertState() === 'sending'">Javi mi</button>
+                  </div>
+                  @if (alertState() === 'error') {
+                    <p class="error-text">Provjerite e-mail adresu i pokušajte ponovno.</p>
+                  }
+                  <p class="muted small">Adresu koristimo samo za tu jednu poruku. <a routerLink="/privatnost">Privatnost</a></p>
+                </form>
+              }
+            </div>
+          }
+        }
+
         @if (added()) {
           <div class="added">
             ✓ Dodano u košaricu. <a routerLink="/kosarica">Pogledaj košaricu</a>
@@ -83,10 +115,22 @@
 
         <div class="description">{{ product.description }}</div>
 
+        <button type="button" class="share" (click)="share()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>
+          </svg>
+          Podijeli
+        </button>
+        @if (shareMessage(); as message) {
+          <p class="muted small share-message">{{ message }}</p>
+        }
+
         <ul class="facts muted">
           <li>Dostava u BoxNow paketomat</li>
           <li>Plaćanje karticom preko Stripea</li>
-          <li>Povrat u 14 dana</li>
+          <li><a routerLink="/povrat-i-reklamacije">Povrat u 14 dana</a></li>
         </ul>
       </div>
     </div>

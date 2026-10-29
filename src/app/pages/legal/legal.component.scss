@@ -1,0 +1,48 @@
+.page {
+  max-width: 760px;
+  padding-top: 32px;
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  h2 {
+    font-size: 15px;
+    margin: 28px 0 8px;
+  }
+
+  h3 {
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 20px 0 6px;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+}
+
+.form-sheet {
+  margin: 16px 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+
+  .line {
+    padding-bottom: 24px;
+    border-bottom: 1px dotted var(--muted);
+  }
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}

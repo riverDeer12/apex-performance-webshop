@@ -191,3 +191,82 @@
   padding-left: 18px;
   font-size: 14px;
 }
+
+.old {
+  font-size: 16px;
+  font-weight: 400;
+  margin-right: 4px;
+}
+
+.client-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #e8f5ec;
+  color: var(--success);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.alert-box {
+  margin: 0 0 16px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--line);
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.alert-row {
+  display: flex;
+  gap: 8px;
+
+  input {
+    flex: 1;
+    min-width: 0;
+    min-height: 48px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font: inherit;
+  }
+}
+
+.error-text {
+  margin-top: 8px !important;
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.small {
+  margin-top: 8px !important;
+  font-size: 13px;
+}
+
+.share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.share-message {
+  word-break: break-all;
+}

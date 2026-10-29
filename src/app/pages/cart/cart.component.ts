@@ -3,7 +3,8 @@ import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ShopApiService } from '../../core/shop-api.service';
 import { CartService, MaxQuantity } from '../../core/cart.service';
-import { PromoCheck, ShopSettings, formatPrice } from '../../core/models';
+import { CartItem, PromoCheck, ShopSettings, clientUnitDiscount, formatPrice } from '../../core/models';
+import { AccountService } from '../../core/account.service';
 
 const BoxNowScript = 'https://widget-cdn.boxnow.hr/map-widget/client/v5.js';
 
@@ -37,13 +38,11 @@ export class CartComponent implements AfterViewChecked, OnDestroy {
   readonly checkingPromo = signal(false);
 
   // Discount per piece from the shop, multiplied here so changing quantities needs no new check.
-  readonly discount = computed(() => {
-    const promo = this.promo();
-    if (!promo) return 0;
+  readonly discount = computed(() =>
+    this.cart.items().reduce((sum, item) => sum + this.discountOf(item) * item.quantity, 0));
 
-    return this.cart.items().reduce((sum, item) =>
-      sum + (promo.items.find((x) => x.variantId === item.variantId)?.unitDiscount ?? 0) * item.quantity, 0);
-  });
+  // Terms and the right to withdraw accepted before paying.
+  readonly accepted = signal(false);
   readonly productsTotal = computed(() => this.cart.subtotal() - this.discount());
 
   readonly shipping = computed(() => {
@@ -65,7 +64,8 @@ export class CartComponent implements AfterViewChecked, OnDestroy {
 
   private mapLoaded = false;
 
-  constructor(public api: ShopApiService, public cart: CartService, private zone: NgZone) {
+  constructor(public api: ShopApiService, public cart: CartService, public account: AccountService,
+              private zone: NgZone) {
     api.getSettings().subscribe({ next: (settings) => this.settings.set(settings) });
     this.choosingLocker.set(!cart.locker());
     this.checkProducts();
@@ -99,9 +99,27 @@ export class CartComponent implements AfterViewChecked, OnDestroy {
     return this.promo()?.checkedFor === this.variantKey();
   }
 
-  discountOf(variantId: string): number {
-    return this.promo()?.items.find((x) => x.variantId === variantId)?.unitDiscount ?? 0;
+  // Per piece the bigger of the promo code and the client discount counts, like at checkout.
+  discountOf(item: CartItem): number {
+    const promo = this.promo()?.items.find((x) => x.variantId === item.variantId)?.unitDiscount ?? 0;
+    return Math.max(promo, clientUnitDiscount(this.account.clientDiscount(), item.price));
   }
+
+  // Name of the discount line: promo code, client discount or both.
+  readonly discountName = computed(() => {
+    const promo = this.promo();
+    const percent = this.account.clientDiscount();
+    const items = this.cart.items();
+    const usesPromo = !!promo && items.some((item) => {
+      const promoDiscount = promo.items.find((x) => x.variantId === item.variantId)?.unitDiscount ?? 0;
+      return promoDiscount > 0 && promoDiscount >= clientUnitDiscount(percent, item.price);
+    });
+    const usesClient = percent > 0 && items.some((item) =>
+      clientUnitDiscount(percent, item.price) > (promo?.items.find((x) => x.variantId === item.variantId)?.unitDiscount ?? 0));
+
+    return [usesPromo ? `Promo kod ${promo!.code}` : '', usesClient ? `Popust za klijente ${percent} %` : '']
+      .filter(Boolean).join(' + ');
+  });
 
   private checkPromo(code: string, silent: boolean): void {
     this.checkingPromo.set(true);
@@ -151,7 +169,8 @@ export class CartComponent implements AfterViewChecked, OnDestroy {
   }
 
   canPay = () =>
-    this.cart.items().length > 0 && !!this.cart.locker() && this.unavailable().size === 0 && !this.paying();
+    this.cart.items().length > 0 && !!this.cart.locker() && this.unavailable().size === 0 && this.accepted() &&
+    !this.paying();
 
   pay(): void {
     const locker = this.cart.locker();

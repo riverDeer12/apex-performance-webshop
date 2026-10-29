@@ -7,6 +7,14 @@
 </section>
 
 <section class="container">
+  @if (account.clientDiscount() > 0) {
+    <p class="client-banner">Prijavljeni ste kao klijent studija: cijene uključuju vaših
+      <strong>{{ account.clientDiscount() }} % popusta</strong>.</p>
+  } @else if (offeredDiscount() > 0 && !account.isLoggedIn()) {
+    <p class="client-banner">Klijent studija? <a routerLink="/prijava">Prijavite se</a> računom iz aplikacije i
+      ostvarite <strong>{{ offeredDiscount() }} % popusta</strong> na sve proizvode.</p>
+  }
+
   @if (categories().length > 1) {
     <div class="filters" role="group" aria-label="Kategorije">
       <button type="button" [class.active]="!category()" (click)="category.set(null)">Sve</button>
@@ -41,7 +49,11 @@
           <div class="card-body">
             <span class="muted category">{{ product.category }}</span>
             <span class="name">{{ product.name }}</span>
-            <span class="price">{{ formatPrice(product.price) }}</span>
+            @if (clientPrice(product); as clientPrice) {
+              <span class="price"><s class="muted old">{{ formatPrice(product.price) }}</s> {{ formatPrice(clientPrice) }}</span>
+            } @else {
+              <span class="price">{{ formatPrice(product.price) }}</span>
+            }
           </div>
         </a>
       }

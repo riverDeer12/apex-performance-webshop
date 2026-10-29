@@ -1,0 +1,30 @@
+<section class="container page">
+  <h1>Prijava</h1>
+  <p class="muted">Prijavite se računom iz aplikacije Apex Performance.
+    @if (clientDiscount() > 0) {
+      Klijenti studija nakon prijave imaju <strong>{{ clientDiscount() }} % popusta</strong> na sve proizvode.
+    }
+  </p>
+
+  <form class="form" (submit)="$event.preventDefault(); submit()">
+    <label for="username">Korisničko ime ili e-mail</label>
+    <input id="username" type="text" autocomplete="username" [value]="username()"
+           (input)="username.set($any($event.target).value)" required>
+
+    <label for="password">Lozinka</label>
+    <input id="password" type="password" autocomplete="current-password" [value]="password()"
+           (input)="password.set($any($event.target).value)" required>
+
+    @if (error()) {
+      <p class="notice error">{{ error() }}</p>
+    }
+
+    <button type="submit" class="button wide" [disabled]="!username().trim() || !password() || loading()">
+      {{ loading() ? 'Prijava…' : 'Prijavi se' }}
+    </button>
+  </form>
+
+  <p class="muted small">Račun dobivate kao klijent studija. Zaboravljenu lozinku promijenite na
+    <a href="https://apex-performance.fit">apex-performance.fit</a>.
+    Za kupnju prijava nije potrebna – <a routerLink="/">nastavi bez prijave</a>.</p>
+</section>

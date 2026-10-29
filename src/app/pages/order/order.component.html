@@ -51,7 +51,7 @@
               </tr>
             }
             @if (order.discount > 0) {
-              <tr class="sum"><td colspan="2">Promo kod {{ order.promoCode }}</td><td class="price">−{{ formatPrice(order.discount) }}</td></tr>
+              <tr class="sum"><td colspan="2">{{ discountLabel(order) }}</td><td class="price">−{{ formatPrice(order.discount) }}</td></tr>
             }
             <tr class="sum"><td colspan="2">Dostava</td><td class="price">{{ formatPrice(order.shippingPrice) }}</td></tr>
             <tr class="sum total"><td colspan="2">Ukupno</td><td class="price">{{ formatPrice(order.total) }}</td></tr>

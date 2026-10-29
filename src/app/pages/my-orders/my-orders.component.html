@@ -1,0 +1,54 @@
+<section class="container page">
+  <div class="title">
+    <div>
+      <h1>Moje narudžbe</h1>
+      @if (account.me(); as me) {
+        <p class="muted">{{ me.name }} · {{ me.email }}
+          @if (me.isClient && me.clientDiscountPercent > 0) {
+            · <strong class="client">klijent studija, {{ me.clientDiscountPercent }} % popusta</strong>
+          }
+        </p>
+      }
+    </div>
+    <button type="button" class="button secondary" (click)="logout()">Odjava</button>
+  </div>
+
+  @if (orders(); as orders) {
+    @if (orders.length === 0) {
+      <p class="muted">Još nema narudžbi. Narudžbe napravljene dok ste prijavljeni pojavit će se ovdje.</p>
+      <a routerLink="/" class="button">Pogledaj proizvode</a>
+    }
+    @for (order of orders; track order.id) {
+      <article class="order">
+        <header>
+          <strong>{{ order.number }}</strong>
+          <span class="muted">{{ (order.paidAt ?? order.createdAt) | date: 'dd.MM.yyyy.' }}</span>
+          <span class="status {{ order.status }}">{{ statusText(order.status) }}</span>
+        </header>
+        <ul>
+          @for (item of order.items; track $index) {
+            <li>
+              <span>{{ item.quantity }} × {{ item.productName }}@if (item.variantName) {<span class="muted"> · {{ item.variantName }}</span>}</span>
+              <span class="price">{{ formatPrice((item.unitPrice - item.unitDiscount) * item.quantity) }}</span>
+            </li>
+          }
+        </ul>
+        <footer>
+          <span class="muted">BoxNow: {{ order.boxNowLockerAddress }}
+            @if (order.boxNowParcelId) { · pošiljka {{ order.boxNowParcelId }} }
+          </span>
+          <span>
+            @if (order.discount > 0) {
+              <span class="muted">{{ discountLabel(order) }} −{{ formatPrice(order.discount) }} · </span>
+            }
+            <strong>{{ formatPrice(order.total) }}</strong>
+          </span>
+        </footer>
+      </article>
+    }
+  } @else if (failed()) {
+    <p class="notice error">Narudžbe se trenutno ne mogu učitati.</p>
+  } @else {
+    <div class="skeleton" style="height: 120px"></div>
+  }
+</section>

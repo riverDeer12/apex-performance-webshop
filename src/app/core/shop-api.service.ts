@@ -48,6 +48,20 @@ export class ShopApiService {
 
     imageUrl = (imageId: string) => this.url + "/images/" + imageId;
 
+    // Page with the product's link preview (Instagram, WhatsApp), it sends people on to the shop.
+    shareUrl = (slug: string) => this.url + "/share/" + encodeURIComponent(slug);
+
+    getMyOrders = () => this.http.get<Order[]>(this.url + "/my-orders");
+
+    // "Let me know when it's back": one email when the size or color is in stock again.
+    createStockAlert = (variantId: string, email: string) =>
+        this.http.post(this.url + "/stock-alerts", { variantId, email });
+
+    // Counts a page view, nothing about the visitor is sent.
+    countVisit(path: string): void {
+        this.http.post(this.url + "/visits", { path }).subscribe({ error: () => {} });
+    }
+
     // Products may have changed (stock, removed) after a failed checkout.
     refreshProducts(): void {
         this.products$ = undefined;
