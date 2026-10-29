@@ -9,6 +9,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
-    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
+    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
   ]
 };

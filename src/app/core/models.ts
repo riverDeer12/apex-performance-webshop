@@ -17,6 +17,8 @@ export interface Product {
     // The first one is the main picture.
     imageIds: string[];
     variants: Variant[];
+    // When it was added, for sorting by newest.
+    createdAt?: string | null;
 }
 
 export interface ShopSettings {

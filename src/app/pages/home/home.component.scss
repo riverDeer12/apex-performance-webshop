@@ -140,3 +140,72 @@
   font-weight: 400;
   font-size: 14px;
 }
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search {
+  position: relative;
+  flex: 1 1 160px;
+
+  svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+  }
+
+  input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px 0 42px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    font: inherit;
+  }
+}
+
+.sort select {
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.filters button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.count {
+  margin-left: 4px;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.results {
+  margin: 0 0 12px;
+}
+
+.more {
+  margin-top: 32px;
+  text-align: center;
+
+  p {
+    margin: 0 0 12px;
+    font-size: 14px;
+  }
+}
+
+.empty .button {
+  margin-top: 8px;
+}

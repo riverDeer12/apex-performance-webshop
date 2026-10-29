@@ -15,11 +15,33 @@
       ostvarite <strong>{{ offeredDiscount() }} % popusta</strong> na sve proizvode.</p>
   }
 
+  @if ((products()?.length ?? 0) > 8) {
+    <div class="toolbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label for="search" class="visually-hidden">Pretraži proizvode</label>
+        <input id="search" type="search" placeholder="Pretraži" autocomplete="off" maxlength="80"
+               [value]="search()" (input)="setSearch($any($event.target).value)">
+      </div>
+      <label class="sort">
+        <span class="visually-hidden">Poredaj</span>
+        <select [value]="sort()" (change)="setSort($any($event.target).value)">
+          @for (item of sorts; track item.value) {
+            <option [value]="item.value" [selected]="item.value === sort()">{{ item.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  }
+
   @if (categories().length > 1) {
     <div class="filters" role="group" aria-label="Kategorije">
-      <button type="button" [class.active]="!category()" (click)="category.set(null)">Sve</button>
-      @for (item of categories(); track item) {
-        <button type="button" [class.active]="category() === item" (click)="category.set(item)">{{ item }}</button>
+      <button type="button" [class.active]="!category()" (click)="setCategory(null)">
+        Sve <span class="count">{{ search().trim() ? matchingAll() : (products()?.length ?? 0) }}</span></button>
+      @for (item of categories(); track item.name) {
+        <button type="button" [class.active]="category() === item.name" [disabled]="item.count === 0 && category() !== item.name"
+                (click)="setCategory(item.name)">{{ item.name }} <span class="count">{{ item.count }}</span></button>
       }
     </div>
   }
@@ -32,9 +54,17 @@
         <div><div class="skeleton image"></div><div class="skeleton line"></div></div>
       }
     </div>
-  } @else if (visible().length === 0) {
+  } @else if (products()!.length === 0) {
     <p class="empty muted">Prvi proizvodi stižu uskoro.</p>
+  } @else if (matching().length === 0) {
+    <div class="empty">
+      <p class="muted">Nema proizvoda za „{{ search().trim() }}“{{ category() ? ' u kategoriji ' + category() : '' }}.</p>
+      <button type="button" class="button secondary" (click)="clearFilters()">Prikaži sve proizvode</button>
+    </div>
   } @else {
+    @if (search().trim()) {
+      <p class="results muted">Pronađeno: {{ matching().length }}</p>
+    }
     <div class="grid">
       @for (product of visible(); track product.id) {
         <a class="card" [routerLink]="['/proizvod', product.slug]">
@@ -58,5 +88,13 @@
         </a>
       }
     </div>
+
+    @if (remaining() > 0) {
+      <div class="more">
+        <p class="muted">Prikazano {{ visible().length }} od {{ matching().length }}</p>
+        <button type="button" class="button secondary" (click)="showMore()">
+          Prikaži još {{ remaining() < 24 ? remaining() : 24 }}</button>
+      </div>
+    }
   }
 </section>
