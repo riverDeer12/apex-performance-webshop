@@ -117,7 +117,7 @@ export class CartComponent implements AfterViewChecked, OnDestroy {
     const usesClient = percent > 0 && items.some((item) =>
       clientUnitDiscount(percent, item.price) > (promo?.items.find((x) => x.variantId === item.variantId)?.unitDiscount ?? 0));
 
-    return [usesPromo ? `Promo kod ${promo!.code}` : '', usesClient ? `Popust za klijente ${percent} %` : '']
+    return [usesPromo ? `Promo kod ${promo!.code}` : '', usesClient ? `Popust za članove ${percent} %` : '']
       .filter(Boolean).join(' + ');
   });
 

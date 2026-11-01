@@ -98,9 +98,9 @@ export const formatPrice = (value: number) =>
 export const clientUnitDiscount = (percent: number, price: number) =>
     percent > 0 ? Math.min(price, Math.round(price * percent) / 100) : 0;
 
-// What an order's discount was, e.g. "Promo kod APEX10" or "Popust za klijente 10 %".
+// What an order's discount was, e.g. "Promo kod APEX10" or "Popust za članove 10 %".
 export function discountLabel(order: Pick<Order, "promoCode" | "clientDiscountPercent">): string {
-    const client = order.clientDiscountPercent ? `popust za klijente ${order.clientDiscountPercent} %` : "";
+    const client = order.clientDiscountPercent ? `popust za članove ${order.clientDiscountPercent} %` : "";
     const promo = order.promoCode ? `promo kod ${order.promoCode}` : "";
     const text = [promo, client].filter(Boolean).join(" i ") || "popust";
 

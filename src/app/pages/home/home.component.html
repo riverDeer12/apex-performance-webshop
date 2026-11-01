@@ -1,20 +1,20 @@
 <section class="container">
   <header class="page-title">
-    <p class="brand-eyebrow">APEX</p>
+    <p class="brand-eyebrow">APEX PERFORMANCE</p>
     <h1>Shop</h1>
     <p>Odjeća i oprema studija Apex Performance</p>
   </header>
 
   <div class="banner">
     <div>
-      <p class="banner-eyebrow">Apex Performance</p>
+      <p class="banner-eyebrow">Apex Performance Shop</p>
       <h2>Treniraj u opremi koju nosimo i mi.</h2>
       <p class="banner-text">Dostava u BoxNow paketomat diljem Hrvatske · povrat u 14 dana</p>
     </div>
     @if (account.clientDiscount() > 0) {
-      <p class="banner-badge">Vaš popust za klijente: <strong>{{ account.clientDiscount() }} %</strong></p>
+      <p class="banner-badge">Vaš popust za članove: <strong>{{ account.clientDiscount() }} %</strong></p>
     } @else if (offeredDiscount() > 0 && !account.isLoggedIn()) {
-      <a routerLink="/prijava" class="banner-badge link">Klijent studija? Prijavite se za
+      <a routerLink="/prijava" class="banner-badge link">Član Apex Performance-a? Prijavite se za
         <strong>{{ offeredDiscount() }} % popusta</strong> <span aria-hidden="true">→</span></a>
     }
   </div>

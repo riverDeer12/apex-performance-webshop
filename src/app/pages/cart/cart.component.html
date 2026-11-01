@@ -121,8 +121,8 @@
           {{ paying() ? 'Otvaram plaćanje…' : 'Naruči i plati karticom' }}
         </button>
         @if (!account.isLoggedIn()) {
-          <p class="muted small">Klijent studija? <a routerLink="/prijava" [queryParams]="{ povratak: '/kosarica' }">Prijavite se</a>
-            za popust za klijente.</p>
+          <p class="muted small">Član Apex Performance-a? <a routerLink="/prijava" [queryParams]="{ povratak: '/kosarica' }">Prijavite se</a>
+            za popust za članove.</p>
         }
         <p class="muted small">Plaćanje je na sigurnoj stranici Stripea. Fiskalizirani račun stiže na vaš e-mail.</p>
       </aside>

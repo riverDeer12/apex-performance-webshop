@@ -5,7 +5,7 @@
       @if (account.me(); as me) {
         <p class="muted">{{ me.name }} · {{ me.email }}
           @if (me.isClient && me.clientDiscountPercent > 0) {
-            · <strong class="client">klijent studija, {{ me.clientDiscountPercent }} % popusta</strong>
+            · <strong class="client">član Apex Performance-a, {{ me.clientDiscountPercent }} % popusta</strong>
           }
         </p>
       }

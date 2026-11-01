@@ -8,7 +8,7 @@
     @if (soldOut()) {
       <span class="tag">Rasprodano</span>
     } @else if (clientPrice() !== null) {
-      <span class="tag client">Cijena za klijente</span>
+      <span class="tag client">Cijena za članove</span>
     }
     @if (sizes().length > 1 && !soldOut()) {
       <span class="sizes">{{ sizes().join(' · ') }}</span>
