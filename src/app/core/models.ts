@@ -19,6 +19,10 @@ export interface Product {
     variants: Variant[];
     // When it was added, for sorting by newest.
     createdAt?: string | null;
+    // Words customers filter by, e.g. "trening".
+    keywords?: string[] | null;
+    // Products picked in the administration to go with this one.
+    relatedProductIds?: string[] | null;
 }
 
 export interface ShopSettings {

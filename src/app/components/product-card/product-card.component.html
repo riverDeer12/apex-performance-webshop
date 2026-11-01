@@ -1,0 +1,38 @@
+<a class="card" [routerLink]="['/proizvod', product().slug]">
+  <div class="image">
+    @if (product().imageIds.length) {
+      <img [src]="api.imageUrl(product().imageIds[0])" [alt]="product().name" loading="lazy">
+    } @else {
+      <img src="logo.png" alt="" class="placeholder">
+    }
+    @if (soldOut()) {
+      <span class="tag">Rasprodano</span>
+    } @else if (clientPrice() !== null) {
+      <span class="tag client">Cijena za klijente</span>
+    }
+    @if (sizes().length > 1 && !soldOut()) {
+      <span class="sizes">{{ sizes().join(' · ') }}</span>
+    }
+  </div>
+  <div class="body">
+    <span class="category">{{ product().category }}</span>
+    <span class="name">{{ product().name }}</span>
+    <div class="bottom">
+      @if (clientPrice(); as clientPrice) {
+        <span class="price"><s class="old">{{ formatPrice(product().price) }}</s> {{ formatPrice(clientPrice) }}</span>
+      } @else {
+        <span class="price">{{ formatPrice(product().price) }}</span>
+      }
+      @if (colors().shown.length > 1) {
+        <span class="swatches" [attr.aria-label]="colors().label">
+          @for (color of colors().shown; track color.name) {
+            <span class="swatch" [class.light]="color.light" [style.background]="color.background" [title]="color.name"></span>
+          }
+          @if (colors().more) {
+            <span class="more">+{{ colors().more }}</span>
+          }
+        </span>
+      }
+    </div>
+  </div>
+</a>

@@ -6,6 +6,8 @@ import { AccountService } from '../../core/account.service';
 import { SeoService } from '../../core/seo.service';
 import { environment } from '../../../environments/environment';
 import { Product, Variant, clientUnitDiscount, formatPrice, variantName } from '../../core/models';
+import { compareSizes, suggestions, swatchBackground } from '../../core/catalog';
+import { ProductCardComponent } from '../../components/product-card/product-card.component';
 
 /**
  * Product with its pictures, sizes and colors. Adding to the cart needs a
@@ -14,7 +16,7 @@ import { Product, Variant, clientUnitDiscount, formatPrice, variantName } from '
  */
 @Component({
   selector: 'app-product',
-  imports: [RouterLink],
+  imports: [RouterLink, ProductCardComponent],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss'
 })
@@ -27,8 +29,18 @@ export class ProductComponent {
   readonly quantity = signal(1);
   readonly added = signal(false);
 
-  readonly sizes = computed(() => this.unique((x) => x.size));
+  readonly sizes = computed(() => this.unique((x) => x.size).sort(compareSizes));
   readonly colors = computed(() => this.unique((x) => x.color));
+  readonly colorSwatches = computed(() => this.colors().map((name) => ({ name, background: swatchBackground(name) })));
+
+  // All products, for the suggestions under the product.
+  private readonly catalog = signal<Product[]>([]);
+
+  // Products that go with this one, to make an outfit.
+  readonly suggested = computed(() => {
+    const product = this.product();
+    return product ? suggestions(product, this.catalog()) : [];
+  });
 
   readonly variant = computed<Variant | null>(() => {
     const product = this.product();
@@ -55,6 +67,8 @@ export class ProductComponent {
 
   constructor(route: ActivatedRoute, public api: ShopApiService, private cart: CartService,
               public account: AccountService, private seo: SeoService) {
+    api.getProducts().subscribe({ next: (products) => this.catalog.set(products) });
+
     route.paramMap.subscribe((params) => {
       this.product.set(null);
       this.notFound.set(false);

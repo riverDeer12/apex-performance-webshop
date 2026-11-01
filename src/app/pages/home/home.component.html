@@ -1,29 +1,54 @@
-<section class="hero">
-  <div class="container">
-    <p class="eyebrow">Apex Performance</p>
-    <h1>Treniraj u opremi<br>koju nosimo i mi.</h1>
-    <p class="lead">Odjeća i dodaci studija Apex Performance. Dostava u BoxNow paketomat diljem Hrvatske.</p>
-  </div>
-</section>
-
 <section class="container">
-  @if (account.clientDiscount() > 0) {
-    <p class="client-banner">Prijavljeni ste kao klijent studija: cijene uključuju vaših
-      <strong>{{ account.clientDiscount() }} % popusta</strong>.</p>
-  } @else if (offeredDiscount() > 0 && !account.isLoggedIn()) {
-    <p class="client-banner">Klijent studija? <a routerLink="/prijava">Prijavite se</a> računom iz aplikacije i
-      ostvarite <strong>{{ offeredDiscount() }} % popusta</strong> na sve proizvode.</p>
-  }
+  <header class="page-title">
+    <p class="brand-eyebrow">APEX</p>
+    <h1>Shop</h1>
+    <p>Odjeća i oprema studija Apex Performance</p>
+  </header>
 
-  @if ((products()?.length ?? 0) > 8) {
+  <div class="banner">
+    <div>
+      <p class="banner-eyebrow">Apex Performance</p>
+      <h2>Treniraj u opremi koju nosimo i mi.</h2>
+      <p class="banner-text">Dostava u BoxNow paketomat diljem Hrvatske · povrat u 14 dana</p>
+    </div>
+    @if (account.clientDiscount() > 0) {
+      <p class="banner-badge">Vaš popust za klijente: <strong>{{ account.clientDiscount() }} %</strong></p>
+    } @else if (offeredDiscount() > 0 && !account.isLoggedIn()) {
+      <a routerLink="/prijava" class="banner-badge link">Klijent studija? Prijavite se za
+        <strong>{{ offeredDiscount() }} % popusta</strong> <span aria-hidden="true">→</span></a>
+    }
+  </div>
+
+  @if (failed()) {
+    <p class="notice error">Proizvodi se trenutno ne mogu učitati. Pokušajte ponovno za nekoliko minuta.</p>
+  } @else if (products() === null) {
+    <div class="grid loading">
+      @for (item of placeholders; track item) {
+        <div class="skeleton tile"></div>
+      }
+    </div>
+  } @else if (products()!.length === 0) {
+    <p class="empty muted">Prvi proizvodi stižu uskoro.</p>
+  } @else {
     <div class="toolbar">
       <div class="search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <label for="search" class="visually-hidden">Pretraži proizvode</label>
-        <input id="search" type="search" placeholder="Pretraži" autocomplete="off" maxlength="80"
-               [value]="search()" (input)="setSearch($any($event.target).value)">
+        <input id="search" type="search" placeholder="Pretraži proizvode"
+               autocomplete="off" maxlength="80" [value]="filter().search" (input)="setSearch($any($event.target).value)">
       </div>
+      @if (hasFilters()) {
+        <button type="button" class="button secondary filters-button" (click)="filtersOpen.set(true)"
+                aria-controls="filters" [attr.aria-expanded]="filtersOpen()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          Filtri
+          @if (activeCount()) {
+            <span class="count-badge">{{ activeCount() }}</span>
+          }
+        </button>
+      }
       <label class="sort">
         <span class="visually-hidden">Poredaj</span>
         <select [value]="sort()" (change)="setSort($any($event.target).value)">
@@ -33,68 +58,146 @@
         </select>
       </label>
     </div>
-  }
 
-  @if (categories().length > 1) {
-    <div class="filters" role="group" aria-label="Kategorije">
-      <button type="button" [class.active]="!category()" (click)="setCategory(null)">
-        Sve <span class="count">{{ search().trim() ? matchingAll() : (products()?.length ?? 0) }}</span></button>
-      @for (item of categories(); track item.name) {
-        <button type="button" [class.active]="category() === item.name" [disabled]="item.count === 0 && category() !== item.name"
-                (click)="setCategory(item.name)">{{ item.name }} <span class="count">{{ item.count }}</span></button>
-      }
-    </div>
-  }
-
-  @if (failed()) {
-    <p class="notice error">Proizvodi se trenutno ne mogu učitati. Pokušajte ponovno za nekoliko minuta.</p>
-  } @else if (products() === null) {
-    <div class="grid">
-      @for (item of placeholders; track item) {
-        <div><div class="skeleton image"></div><div class="skeleton line"></div></div>
-      }
-    </div>
-  } @else if (products()!.length === 0) {
-    <p class="empty muted">Prvi proizvodi stižu uskoro.</p>
-  } @else if (matching().length === 0) {
-    <div class="empty">
-      <p class="muted">Nema proizvoda za „{{ search().trim() }}“{{ category() ? ' u kategoriji ' + category() : '' }}.</p>
-      <button type="button" class="button secondary" (click)="clearFilters()">Prikaži sve proizvode</button>
-    </div>
-  } @else {
-    @if (search().trim()) {
-      <p class="results muted">Pronađeno: {{ matching().length }}</p>
-    }
-    <div class="grid">
-      @for (product of visible(); track product.id) {
-        <a class="card" [routerLink]="['/proizvod', product.slug]">
-          <div class="image">
-            @if (product.imageIds.length) {
-              <img [src]="api.imageUrl(product.imageIds[0])" [alt]="product.name" loading="lazy">
-            }
-            @if (soldOut(product)) {
-              <span class="tag">Rasprodano</span>
-            }
-          </div>
-          <div class="card-body">
-            <span class="muted category">{{ product.category }}</span>
-            <span class="name">{{ product.name }}</span>
-            @if (clientPrice(product); as clientPrice) {
-              <span class="price"><s class="muted old">{{ formatPrice(product.price) }}</s> {{ formatPrice(clientPrice) }}</span>
-            } @else {
-              <span class="price">{{ formatPrice(product.price) }}</span>
-            }
-          </div>
-        </a>
-      }
-    </div>
-
-    @if (remaining() > 0) {
-      <div class="more">
-        <p class="muted">Prikazano {{ visible().length }} od {{ matching().length }}</p>
-        <button type="button" class="button secondary" (click)="showMore()">
-          Prikaži još {{ remaining() < 24 ? remaining() : 24 }}</button>
+    @if (categories().length > 1) {
+      <div class="category-chips" role="group" aria-label="Kategorije">
+        <button type="button" class="chip" [class.active]="filter().categories.length === 0" (click)="pickCategory(null)">Sve</button>
+        @for (item of categories(); track item.value) {
+          <button type="button" class="chip" [class.active]="filter().categories.length === 1 && isPicked('categories', item.value)"
+                  (click)="pickCategory(item.value)">{{ item.value }}</button>
+        }
       </div>
     }
+
+    <div class="layout" [class.no-filters]="!hasFilters()">
+      @if (hasFilters()) {
+        <div class="backdrop" [class.open]="filtersOpen()" (click)="filtersOpen.set(false)"></div>
+        <aside id="filters" class="filters" [class.open]="filtersOpen()" aria-label="Filtri">
+          <div class="filters-head">
+            <h2>Filtri</h2>
+            <button type="button" class="close" (click)="filtersOpen.set(false)" aria-label="Zatvori filtre">✕</button>
+          </div>
+
+          <div class="filters-body">
+            @if (categories().length > 1) {
+              <fieldset>
+                <legend class="section-label">{{ facetTitles.categories }}</legend>
+                @for (item of categories(); track item.value) {
+                  <label class="check" [class.disabled]="item.count === 0 && !isPicked('categories', item.value)">
+                    <input type="checkbox" [checked]="isPicked('categories', item.value)"
+                           [disabled]="item.count === 0 && !isPicked('categories', item.value)"
+                           (change)="toggle('categories', item.value)">
+                    <span class="box" aria-hidden="true"></span>
+                    <span class="label">{{ item.value }}</span>
+                    <span class="count">{{ item.count }}</span>
+                  </label>
+                }
+              </fieldset>
+            }
+
+            @if (colors().length > 1) {
+              <fieldset>
+                <legend class="section-label">{{ facetTitles.colors }}</legend>
+                <div class="swatch-grid">
+                  @for (item of colors(); track item.value) {
+                    <button type="button" class="swatch-option" [class.active]="isPicked('colors', item.value)"
+                            [disabled]="item.count === 0 && !isPicked('colors', item.value)"
+                            [attr.aria-pressed]="isPicked('colors', item.value)" (click)="toggle('colors', item.value)">
+                      <span class="swatch" [style.background]="item.background" aria-hidden="true"></span>
+                      <span class="swatch-name">{{ item.value }}</span>
+                    </button>
+                  }
+                </div>
+              </fieldset>
+            }
+
+            @if (sizes().length > 1) {
+              <fieldset>
+                <legend class="section-label">{{ facetTitles.sizes }}</legend>
+                <div class="size-grid">
+                  @for (item of sizes(); track item.value) {
+                    <button type="button" class="size-option" [class.active]="isPicked('sizes', item.value)"
+                            [disabled]="item.count === 0 && !isPicked('sizes', item.value)"
+                            [attr.aria-pressed]="isPicked('sizes', item.value)" (click)="toggle('sizes', item.value)">
+                      {{ item.value }}</button>
+                  }
+                </div>
+              </fieldset>
+            }
+
+            @if (keywords().length > 0) {
+              <fieldset>
+                <legend class="section-label">{{ facetTitles.keywords }}</legend>
+                <div class="keyword-list">
+                  @for (item of keywords(); track item.value) {
+                    <button type="button" class="chip" [class.active]="isPicked('keywords', item.value)"
+                            [disabled]="item.count === 0 && !isPicked('keywords', item.value)"
+                            [attr.aria-pressed]="isPicked('keywords', item.value)" (click)="toggle('keywords', item.value)">
+                      #{{ item.value }}</button>
+                  }
+                </div>
+                @if (moreKeywords() > 0) {
+                  <button type="button" class="link-button" (click)="allKeywords.set(!allKeywords())">
+                    {{ allKeywords() ? 'Prikaži manje' : 'Prikaži sve (' + (moreKeywords() + 12) + ')' }}</button>
+                }
+              </fieldset>
+            }
+
+            <fieldset>
+              <legend class="section-label">Dostupnost</legend>
+              <label class="switch">
+                <input type="checkbox" [checked]="filter().inStockOnly" (change)="setInStockOnly($any($event.target).checked)">
+                <span class="track" aria-hidden="true"></span>
+                <span>Samo na zalihi</span>
+              </label>
+            </fieldset>
+          </div>
+
+          <div class="filters-foot">
+            <button type="button" class="button ghost" [disabled]="activeCount() === 0" (click)="clearFilters()">Očisti</button>
+            <button type="button" class="button" (click)="filtersOpen.set(false)">
+              Prikaži {{ matching().length }}</button>
+          </div>
+        </aside>
+      }
+
+      <div class="results">
+        @if (activeChips().length || filter().search.trim()) {
+          <div class="active">
+            <span class="muted found">{{ countLabel(matching().length) }}</span>
+            @for (chip of activeChips(); track chip.name + chip.value) {
+              <button type="button" class="chip active removable" (click)="removeChip(chip)"
+                      [attr.aria-label]="'Ukloni filtar ' + chip.label">{{ chip.label }} <span aria-hidden="true">✕</span></button>
+            }
+            @if (activeChips().length > 1) {
+              <button type="button" class="link-button" (click)="clearFilters()">Očisti sve</button>
+            }
+          </div>
+        }
+
+        @if (matching().length === 0) {
+          <div class="empty card-surface">
+            <h2>Nema takvih proizvoda</h2>
+            <p class="muted">Probajte s manje filtara ili drugom riječju.</p>
+            <button type="button" class="button secondary" (click)="clearAll()">Prikaži sve proizvode</button>
+          </div>
+        } @else {
+          <div class="grid">
+            @for (product of visible(); track product.id) {
+              <app-product-card [product]="product" />
+            }
+          </div>
+
+          @if (remaining() > 0) {
+            <div class="more">
+              <p class="muted">Prikazano {{ visible().length }} od {{ matching().length }}</p>
+              <div class="progress"><span [style.width.%]="visible().length / matching().length * 100"></span></div>
+              <button type="button" class="button secondary" (click)="showMore()">
+                Prikaži još {{ remaining() < 24 ? remaining() : 24 }}</button>
+            </div>
+          }
+        }
+      </div>
+    </div>
   }
 </section>

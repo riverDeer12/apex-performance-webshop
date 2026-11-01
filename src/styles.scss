@@ -1,14 +1,20 @@
+// Colors, fonts and shapes of the Apex Performance app (iOS, Android, web).
 :root {
   --blue: #0034c4;
   --blue-dark: #00269a;
+  --navy: #0a1440;
+  --tint: #d5dae9;
+  --tint-soft: #e8ebf4;
   --ink: #12151c;
-  --muted: #5b6475;
-  --line: #e3e7ef;
+  --muted: #6b7180;
+  --line: #e4e3df;
   --surface: #ffffff;
-  --background: #f5f7fb;
+  --background: #f2f1ee;
   --danger: #c62828;
   --success: #1a7f37;
-  --radius: 10px;
+  --radius: 14px;
+  --radius-card: 20px;
+  --shadow: 0 1px 2px rgba(18, 21, 28, 0.04), 0 8px 24px rgba(18, 21, 28, 0.06);
   --heading: "Michroma", "Arial Black", Arial, sans-serif;
 }
 
@@ -46,52 +52,154 @@ img {
   display: block;
 }
 
+button, input, select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
 .container {
   width: 100%;
-  max-width: 1160px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
+}
+
+// "APEX" above a big uppercase title, like the screens of the app.
+.page-title {
+  margin: 32px 0 20px;
+
+  .brand-eyebrow {
+    margin: 0 0 6px;
+    font-family: var(--heading);
+    font-size: 13px;
+    letter-spacing: 0.32em;
+    color: var(--muted);
+  }
+
+  h1 {
+    font-size: clamp(26px, 5vw, 40px);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: var(--muted);
+  }
+}
+
+// Small uppercase label above a group, e.g. "BOJA".
+.section-label {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card-surface {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 48px;
+  gap: 10px;
+  min-height: 52px;
   padding: 0 24px;
   border: 0;
   border-radius: var(--radius);
   background: var(--blue);
   color: #fff;
-  font: inherit;
   font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.1s;
 
   &:hover:not(:disabled) {
     background: var(--blue-dark);
   }
 
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
   }
 
+  // Light blue button next to the main one, like "Template" in the app.
   &.secondary {
+    background: var(--tint);
+    color: var(--blue);
+
+    &:hover:not(:disabled) {
+      background: #c8cfe3;
+    }
+  }
+
+  &.ghost {
     background: transparent;
     color: var(--ink);
     border: 1px solid var(--line);
 
     &:hover:not(:disabled) {
       background: #fff;
-      border-color: var(--ink);
     }
   }
 
   &.wide {
     width: 100%;
+  }
+
+  .arrow {
+    font-size: 18px;
+    letter-spacing: 0;
+  }
+}
+
+// Light blue pill, for filters and keywords.
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--tint-soft);
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: var(--tint);
+  }
+
+  &.active {
+    background: var(--blue);
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 }
 
@@ -118,7 +226,7 @@ img {
 
 // Shown while something loads, instead of a jumping layout.
 .skeleton {
-  background: linear-gradient(90deg, #eceff5 25%, #f6f8fb 50%, #eceff5 75%);
+  background: linear-gradient(90deg, #e6e5e1 25%, #f0efec 50%, #e6e5e1 75%);
   background-size: 200% 100%;
   animation: skeleton 1.2s infinite;
   border-radius: var(--radius);

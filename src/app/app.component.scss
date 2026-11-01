@@ -21,8 +21,8 @@ main {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
+  background: rgba(242, 241, 238, 0.9);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
 }
 
@@ -30,7 +30,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 68px;
 }
 
 .logo {
@@ -41,7 +41,7 @@ main {
   text-decoration: none;
   font-family: var(--heading);
   font-size: 14px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.22em;
 
   b {
     color: var(--blue);
@@ -103,28 +103,49 @@ main {
 }
 
 .footer {
-  margin-top: 64px;
-  padding: 40px 0 24px;
-  background: #fff;
-  border-top: 1px solid var(--line);
+  margin-top: 72px;
+  padding: 48px 0 28px;
+  background: linear-gradient(135deg, var(--navy) 0%, #0b1d6b 60%, var(--blue) 140%);
+  color: #fff;
   font-size: 14px;
 
   h3 {
     font-size: 12px;
-    margin-bottom: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
   }
+
+  .muted {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  a {
+    color: #fff;
+  }
+
+  .footer-logo {
+    filter: invert(1);
+  }
+}
+
+.footer-brand {
+  margin: 12px 0 0;
+  font-family: var(--heading);
+  font-size: 13px;
+  letter-spacing: 0.22em;
 }
 
 .footer-inner {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  gap: 28px;
 }
 
 .legal {
-  margin-top: 24px;
+  margin-top: 28px;
   padding-top: 16px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   font-size: 12px;
 }
 
@@ -132,10 +153,6 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 20px;
-  margin-top: 24px;
+  margin-top: 28px;
   font-size: 14px;
-
-  a {
-    color: var(--ink);
-  }
 }
