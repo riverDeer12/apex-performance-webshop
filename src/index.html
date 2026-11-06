@@ -23,7 +23,11 @@
       display: grid;
       place-items: center;
       background: #090b0d;
+      visibility: hidden;
       transition: opacity 0.35s ease-out;
+    }
+    #splash.shown {
+      visibility: visible;
     }
     #splash.hide {
       opacity: 0;
@@ -46,8 +50,19 @@
       var seen = false;
       try {
         seen = sessionStorage.getItem('apex-splash') === '1';
-        sessionStorage.setItem('apex-splash', '1');
       } catch (e) {}
+
+      // Never to visitors who turned animations off, and once per visit at most.
+      if (seen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        splash.remove();
+        return;
+      }
+
+      // The page is there once the app has drawn something.
+      function ready() {
+        var root = document.querySelector('app-root');
+        return !!root && root.children.length > 0;
+      }
 
       var done = false;
       function finish() {
@@ -58,18 +73,34 @@
         setTimeout(function () { splash.remove(); }, 400);
       }
 
-      // Shown once per visit, never to visitors who turned animations off.
-      if (seen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        splash.remove();
-        return;
-      }
+      // Shown only when loading takes longer than this; a fast load shows nothing.
+      setTimeout(function () {
+        if (ready()) {
+          splash.remove();
+          return;
+        }
+        try {
+          sessionStorage.setItem('apex-splash', '1');
+        } catch (e) {}
 
-      video.addEventListener('ended', finish);
-      video.addEventListener('error', finish);
-      // Longest the splash may stay when the video doesn't play.
-      setTimeout(finish, 4000);
-      var playing = video.play();
-      if (playing && playing.catch) playing.catch(finish);
+        var shownAt = Date.now();
+        splash.classList.add('shown');
+        video.addEventListener('ended', finish);
+        video.addEventListener('error', finish);
+        var playing = video.play();
+        if (playing && playing.catch) playing.catch(finish);
+
+        // Gone once the page is ready, but not sooner than a short moment, so it doesn't flash.
+        var check = setInterval(function () {
+          if (done) return clearInterval(check);
+          if (ready() && Date.now() - shownAt >= 900) {
+            clearInterval(check);
+            finish();
+          }
+        }, 100);
+        // Longest the splash may stay when the video doesn't play.
+        setTimeout(finish, 4000);
+      }, 400);
     })();
   </script>
   <app-root></app-root>
