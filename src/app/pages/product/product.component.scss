@@ -304,38 +304,6 @@
   color: #d0242b;
 }
 
-// Delivery, returns and payment under the cart button.
-.info-strip {
-  display: grid;
-  gap: 2px;
-  margin: 20px 0 8px;
-  padding: 0;
-  list-style: none;
-  border-radius: var(--radius);
-  overflow: hidden;
-
-  li {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 14px;
-    background: var(--tint-soft);
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.45;
-  }
-
-  svg {
-    flex: none;
-    color: var(--blue);
-  }
-
-  strong {
-    display: block;
-    color: var(--ink);
-  }
-}
-
 .client-tag {
   display: inline-block;
   margin-left: 6px;

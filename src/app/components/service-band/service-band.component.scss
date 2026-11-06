@@ -1,0 +1,50 @@
+// From one edge of the page to the other, right above the footer.
+.band {
+  margin-top: 72px;
+  padding: 28px 0;
+  background: var(--tint-soft);
+  border-top: 1px solid var(--tint);
+}
+
+.items {
+  display: grid;
+  gap: 20px;
+  margin: 0 auto;
+  list-style: none;
+
+  @media (min-width: 760px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  svg {
+    flex: none;
+    color: var(--blue);
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  strong {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  a {
+    color: var(--blue);
+  }
+}

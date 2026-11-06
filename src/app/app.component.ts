@@ -9,10 +9,11 @@ import { FavoritesService } from './core/favorites.service';
 import { AnnouncementBarComponent } from './components/announcement-bar/announcement-bar.component';
 import { HeaderSearchComponent } from './components/header-search/header-search.component';
 import { CartDrawerComponent } from './components/cart-drawer/cart-drawer.component';
+import { ServiceBandComponent } from './components/service-band/service-band.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, AnnouncementBarComponent, HeaderSearchComponent, CartDrawerComponent],
+  imports: [RouterOutlet, RouterLink, AnnouncementBarComponent, HeaderSearchComponent, CartDrawerComponent, ServiceBandComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

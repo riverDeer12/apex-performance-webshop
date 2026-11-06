@@ -5,7 +5,7 @@ import { CartService, MaxQuantity } from '../../core/cart.service';
 import { AccountService } from '../../core/account.service';
 import { SeoService } from '../../core/seo.service';
 import { environment } from '../../../environments/environment';
-import { Product, ShopSettings, Variant, clientUnitDiscount, formatPrice, variantName } from '../../core/models';
+import { Product, Variant, clientUnitDiscount, formatPrice, variantName } from '../../core/models';
 import { FavoritesService } from '../../core/favorites.service';
 import { RecentlyViewedService } from '../../core/recently-viewed.service';
 import { SizeGuideComponent } from '../../components/size-guide/size-guide.component';
@@ -77,7 +77,6 @@ export class ProductComponent {
     return !!product && this.favorites.ids().includes(product.id);
   });
 
-  readonly settings = signal<ShopSettings | null>(null);
   readonly sizeGuideOpen = signal(false);
   // Bar with the price and the cart button at the bottom of phones, once the main button scrolled away.
   readonly stickyBar = signal(false);
@@ -98,7 +97,6 @@ export class ProductComponent {
               public account: AccountService, private seo: SeoService, public favorites: FavoritesService,
               private recentlyViewed: RecentlyViewedService) {
     api.getProducts().subscribe({ next: (products) => this.catalog.set(products) });
-    api.getSettings().subscribe({ next: (settings) => this.settings.set(settings) });
 
     route.paramMap.subscribe((params) => {
       this.product.set(null);
