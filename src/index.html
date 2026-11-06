@@ -14,8 +14,64 @@
   <meta property="og:title" content="Apex Performance Shop">
   <meta property="og:description" content="Odjeća i oprema studija Apex Performance. Dostava u BoxNow paketomat diljem Hrvatske.">
   <meta property="og:image" content="https://apex-performance.fit/assets/images/logo_light_theme.png">
+  <!-- Intro of the Apex Performance app (splash.mp4 from iOS and Android), once per visit. -->
+  <style>
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      background: #090b0d;
+      transition: opacity 0.35s ease-out;
+    }
+    #splash.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #splash video {
+      width: min(72vw, 380px);
+      aspect-ratio: 1;
+    }
+  </style>
 </head>
 <body>
+  <div id="splash" aria-hidden="true">
+    <video src="splash.mp4" muted playsinline preload="auto"></video>
+  </div>
+  <script>
+    (function () {
+      var splash = document.getElementById('splash');
+      var video = splash.querySelector('video');
+      var seen = false;
+      try {
+        seen = sessionStorage.getItem('apex-splash') === '1';
+        sessionStorage.setItem('apex-splash', '1');
+      } catch (e) {}
+
+      var done = false;
+      function finish() {
+        if (done) return;
+        done = true;
+        video.pause();
+        splash.classList.add('hide');
+        setTimeout(function () { splash.remove(); }, 400);
+      }
+
+      // Shown once per visit, never to visitors who turned animations off.
+      if (seen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        splash.remove();
+        return;
+      }
+
+      video.addEventListener('ended', finish);
+      video.addEventListener('error', finish);
+      // Longest the splash may stay when the video doesn't play.
+      setTimeout(finish, 4000);
+      var playing = video.play();
+      if (playing && playing.catch) playing.catch(finish);
+    })();
+  </script>
   <app-root></app-root>
 </body>
 </html>
