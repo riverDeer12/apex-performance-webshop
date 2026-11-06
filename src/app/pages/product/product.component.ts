@@ -143,6 +143,8 @@ export class ProductComponent {
     const variant = this.variant();
     if (!product || !variant?.inStock) return;
 
+    // Counted like a page view: only the product and the day.
+    this.api.countVisit('/u-kosaricu/' + product.slug);
     this.cart.add({
       variantId: variant.id,
       slug: product.slug,
