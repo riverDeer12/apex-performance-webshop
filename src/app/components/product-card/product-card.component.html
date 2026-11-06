@@ -19,6 +19,9 @@
   <div class="body">
     <span class="category">{{ product().category }}</span>
     <span class="name">{{ product().name }}</span>
+    @if (soldOut()) {
+      <span class="notify">Javi mi kad stigne →</span>
+    }
     <div class="bottom">
       @if (clientPrice(); as clientPrice) {
         <span class="price"><s class="old">{{ formatPrice(product().price) }}</s> {{ formatPrice(clientPrice) }}</span>

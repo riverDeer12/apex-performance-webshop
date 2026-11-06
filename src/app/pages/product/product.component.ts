@@ -84,6 +84,9 @@ export class ProductComponent {
   private readonly buy = viewChild<ElementRef<HTMLElement>>('buy');
 
   readonly alertEmail = signal('');
+  // Logged in members are told at their account's email, unless they choose another one.
+  readonly otherEmail = signal(false);
+  readonly soldOut = computed(() => !!this.product() && this.product()!.variants.every((x) => !x.inStock));
   readonly alertState = signal<'idle' | 'sending' | 'sent' | 'error'>('idle');
   readonly shareMessage = signal<string | null>(null);
 
@@ -113,6 +116,7 @@ export class ProductComponent {
           this.size.set(this.sizes().length === 1 ? this.sizes()[0] : null);
           this.color.set(this.colors().length === 1 ? this.colors()[0] : null);
           this.alertState.set('idle');
+          this.otherEmail.set(false);
           this.setSeo(product);
         },
         error: () => this.notFound.set(true),
@@ -160,6 +164,8 @@ export class ProductComponent {
   // "Let me know when it's back" for the chosen size or color.
   requestAlert(): void {
     const variant = this.variant();
+    const memberEmail = this.otherEmail() ? null : this.account.me()?.email;
+    if (memberEmail) this.alertEmail.set(memberEmail);
     const email = this.alertEmail().trim();
     if (!variant || !email || this.alertState() === 'sending') return;
 

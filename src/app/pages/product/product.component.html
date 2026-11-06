@@ -43,7 +43,8 @@
             <div class="choices">
               @for (item of sizes(); track item) {
                 <button type="button" [class.selected]="size() === item"
-                        [class.unavailable]="!available(item, color())" (click)="size.set(item)">{{ item }}</button>
+                        [class.unavailable]="!available(item, color())" (click)="size.set(item)"
+                        [attr.title]="available(item, color()) ? null : 'Rasprodano: odaberite i javit ćemo vam'">{{ item }}</button>
               }
             </div>
           </div>
@@ -55,7 +56,8 @@
             <div class="choices">
               @for (item of colorSwatches(); track item.name) {
                 <button type="button" class="color" [class.selected]="color() === item.name"
-                        [class.unavailable]="!available(size(), item.name)" (click)="color.set(item.name)">
+                        [class.unavailable]="!available(size(), item.name)" (click)="color.set(item.name)"
+                        [attr.title]="available(size(), item.name) ? null : 'Rasprodano: odaberite i javit ćemo vam'">
                   <span class="dot" [style.background]="item.background" aria-hidden="true"></span>{{ item.name }}</button>
               }
             </div>
@@ -65,7 +67,7 @@
         <p class="stock">
           @if (variant(); as variant) {
             @if (!variant.inStock) {
-              <span class="out">Trenutno nema na zalihi</span>
+              <span class="out">Rasprodano</span>
             } @else if (variant.fewLeft) {
               <span class="few">Još samo {{ variant.fewLeft }} kom.</span>
             } @else {
@@ -75,6 +77,43 @@
             <span class="muted">Odaberite {{ sizes().length && !size() ? 'veličinu' : 'boju' }}.</span>
           }
         </p>
+
+
+        @if (variant(); as variant) {
+          @if (!variant.inStock) {
+            <div class="alert-box" id="javi-mi">
+              @if (alertState() === 'sent') {
+                <p class="alert-done"><span class="bell" aria-hidden="true">✓</span>
+                  <span><strong>Javit ćemo vam!</strong> Kad {{ variantName(variant) || 'proizvod' }} bude ponovno na zalihi,
+                  stiže jedan e-mail na {{ alertEmail() }}.</span></p>
+              } @else {
+                <form (submit)="$event.preventDefault(); requestAlert()">
+                  <p class="alert-title"><span class="bell" aria-hidden="true">🔔</span> Javi mi kad bude dostupno</p>
+                  @if (account.me()?.email && !otherEmail()) {
+                    <p class="muted small">Poslat ćemo jedan e-mail na <strong>{{ account.me()!.email }}</strong>.
+                      <button type="button" class="link-button small" (click)="otherEmail.set(true)">Drugi e-mail</button></p>
+                    <button type="submit" class="button wide" [disabled]="alertState() === 'sending'">Javi mi</button>
+                  } @else {
+                    <label for="alertEmail" class="visually-hidden">E-mail</label>
+                    <div class="alert-row">
+                      <input id="alertEmail" type="email" placeholder="vaš e-mail" autocomplete="email" required
+                             [value]="alertEmail()" (input)="alertEmail.set($any($event.target).value)">
+                      <button type="submit" class="button"
+                              [disabled]="!alertEmail().trim() || alertState() === 'sending'">Javi mi</button>
+                    </div>
+                  }
+                  @if (alertState() === 'error') {
+                    <p class="error-text">Provjerite e-mail adresu i pokušajte ponovno.</p>
+                  }
+                  <p class="muted small">Adresu koristimo samo za tu jednu poruku. <a routerLink="/privatnost">Privatnost</a></p>
+                </form>
+              }
+            </div>
+          }
+        } @else if (soldOut()) {
+          <p class="alert-hint"><span class="bell" aria-hidden="true">🔔</span>
+            Rasprodano. Odaberite veličinu i boju i javit ćemo vam kad ponovno stigne.</p>
+        }
 
         <div class="buy" #buy>
           <div class="quantity" aria-label="Količina">
@@ -92,29 +131,6 @@
           </button>
         </div>
 
-        @if (variant(); as variant) {
-          @if (!variant.inStock) {
-            <div class="alert-box">
-              @if (alertState() === 'sent') {
-                <p><strong>Javit ćemo vam!</strong> Kad bude ponovno na zalihi, stiže vam jedan e-mail.</p>
-              } @else {
-                <form (submit)="$event.preventDefault(); requestAlert()">
-                  <label for="alertEmail">Javi mi kad bude dostupno</label>
-                  <div class="alert-row">
-                    <input id="alertEmail" type="email" placeholder="vaš e-mail" autocomplete="email" required
-                           [value]="alertEmail()" (input)="alertEmail.set($any($event.target).value)">
-                    <button type="submit" class="button secondary"
-                            [disabled]="!alertEmail().trim() || alertState() === 'sending'">Javi mi</button>
-                  </div>
-                  @if (alertState() === 'error') {
-                    <p class="error-text">Provjerite e-mail adresu i pokušajte ponovno.</p>
-                  }
-                  <p class="muted small">Adresu koristimo samo za tu jednu poruku. <a routerLink="/privatnost">Privatnost</a></p>
-                </form>
-              }
-            </div>
-          }
-        }
 
 
         <div class="accordion">

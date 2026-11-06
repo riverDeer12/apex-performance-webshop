@@ -552,3 +552,40 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.alert-box {
+  border-color: var(--tint);
+  background: var(--tint-soft);
+
+  .button.wide {
+    width: 100%;
+  }
+}
+
+.alert-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.alert-done {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+}
+
+.alert-hint {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--tint-soft);
+  font-size: 14px;
+}
+
+.link-button.small {
+  font-size: 13px;
+}
