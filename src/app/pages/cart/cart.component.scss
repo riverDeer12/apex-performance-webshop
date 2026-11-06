@@ -145,8 +145,9 @@
 }
 
 .map {
-  min-height: 460px;
-  border-radius: 8px;
+  // A fixed height: the widget's iframe is 100% high and stays small in a box with only a minimum height.
+  height: clamp(420px, 70vh, 640px);
+  border-radius: 12px;
   overflow: hidden;
 }
 

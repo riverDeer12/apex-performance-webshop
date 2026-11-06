@@ -52,6 +52,11 @@ main {
     font-weight: 400;
   }
 
+  // The space between the two parts is lost in the template.
+  .logo-text b {
+    margin-left: 0.45em;
+  }
+
   // Two lines on phones, so the icons keep their room.
   @media (max-width: 600px) {
     flex: 0 1 auto;
@@ -71,6 +76,10 @@ main {
       display: flex;
       flex-direction: column;
       white-space: nowrap;
+
+      b {
+        margin-left: 0;
+      }
     }
   }
 }
