@@ -57,6 +57,10 @@ export class ShopApiService {
     createStockAlert = (variantId: string, email: string) =>
         this.http.post(this.url + "/stock-alerts", { variantId, email });
 
+    // Message of the contact form, sent to the shop's email.
+    sendContact = (message: { name: string; email: string; message: string; orderNumber: string | null; website: string }) =>
+        this.http.post(this.url + "/contact", message);
+
     // Counts a page view, nothing about the visitor is sent.
     countVisit(path: string): void {
         this.http.post(this.url + "/visits", { path }).subscribe({ error: () => {} });

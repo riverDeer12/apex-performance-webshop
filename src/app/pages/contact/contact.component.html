@@ -1,0 +1,61 @@
+<section class="container page">
+  <header class="page-title">
+    <p class="brand-eyebrow">APEX PERFORMANCE</p>
+    <h1>Kontakt</h1>
+    <p>Pitanje o proizvodu, narudžbi ili povratu? Pošaljite poruku i odgovorit ćemo vam e-mailom.</p>
+  </header>
+
+  <div class="card-surface box">
+    @if (state() === 'sent') {
+      <div class="sent">
+        <span class="check" aria-hidden="true">✓</span>
+        <h2>Poruka je poslana</h2>
+        <p class="muted">Odgovorit ćemo vam na {{ email() }}, obično unutar jednog radnog dana.</p>
+        <a routerLink="/" class="button secondary">Natrag u shop</a>
+      </div>
+    } @else {
+      <form (submit)="$event.preventDefault(); send()" novalidate>
+        <div class="row">
+          <label>
+            <span>Ime i prezime</span>
+            <input type="text" autocomplete="name" maxlength="100" required
+                   [value]="name()" (input)="name.set($any($event.target).value)">
+          </label>
+          <label>
+            <span>E-mail</span>
+            <input type="email" autocomplete="email" maxlength="200" required
+                   [value]="email()" (input)="email.set($any($event.target).value)">
+          </label>
+        </div>
+
+        <label>
+          <span>Broj narudžbe <em>(ako se pitanje odnosi na narudžbu)</em></span>
+          <input type="text" maxlength="40" placeholder="npr. AP-2026-0012"
+                 [value]="orderNumber()" (input)="orderNumber.set($any($event.target).value)">
+        </label>
+
+        <label>
+          <span>Poruka</span>
+          <textarea rows="6" maxlength="4000" required
+                    [value]="message()" (input)="message.set($any($event.target).value)"></textarea>
+        </label>
+
+        <!-- Left empty by people, it is not visible. -->
+        <label class="trap" aria-hidden="true">
+          Web stranica
+          <input type="text" tabindex="-1" autocomplete="off" [value]="website()" (input)="website.set($any($event.target).value)">
+        </label>
+
+        @if (state() === 'error') {
+          <p class="error-text">Poruka nije poslana. Provjerite podatke i pokušajte ponovno.</p>
+        } @else if (state() === 'limit') {
+          <p class="error-text">Poslano je previše poruka. Pokušajte ponovno za sat vremena.</p>
+        }
+
+        <button type="submit" class="button wide" [disabled]="!valid() || state() === 'sending'">
+          {{ state() === 'sending' ? 'Šaljem…' : 'Pošalji poruku' }}</button>
+        <p class="muted small">Podatke iz poruke koristimo samo za odgovor. <a routerLink="/privatnost">Privatnost</a></p>
+      </form>
+    }
+  </div>
+</section>

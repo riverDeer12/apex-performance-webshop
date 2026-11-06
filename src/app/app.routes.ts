@@ -8,6 +8,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { MyOrdersComponent } from './pages/my-orders/my-orders.component';
 import { LegalComponent } from './pages/legal/legal.component';
 import { FavoritesComponent } from './pages/favorites/favorites.component';
+import { ContactComponent } from './pages/contact/contact.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'Apex Performance Shop' },
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'prijava', component: LoginComponent },
   { path: 'favoriti', component: FavoritesComponent, title: 'Favoriti · Apex Performance Shop' },
   { path: 'moje-narudzbe', component: MyOrdersComponent },
+  { path: 'kontakt', component: ContactComponent },
   { path: 'uvjeti-kupnje', component: LegalComponent, data: { page: 'terms' } },
   { path: 'povrat-i-reklamacije', component: LegalComponent, data: { page: 'returns' } },
   { path: 'privatnost', component: LegalComponent, data: { page: 'privacy' } },
