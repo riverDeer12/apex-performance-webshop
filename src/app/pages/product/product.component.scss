@@ -398,3 +398,157 @@
     padding: 4px 0 0;
   }
 }
+
+.label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.heart {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+
+  svg {
+    fill: none;
+  }
+
+  &:hover {
+    border-color: var(--ink);
+  }
+
+  &.on {
+    color: #e5484d;
+
+    svg {
+      fill: currentColor;
+    }
+  }
+}
+
+.accordion {
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    list-style: none;
+    cursor: pointer;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: "+";
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--blue);
+    }
+  }
+
+  details[open] summary::after {
+    content: "–";
+  }
+
+  .description,
+  ul {
+    margin: 0 0 16px;
+  }
+
+  ul {
+    padding-left: 18px;
+    color: var(--muted);
+
+    li {
+      margin-bottom: 6px;
+    }
+  }
+}
+
+.description {
+  white-space: pre-line;
+}
+
+.small-title {
+  font-size: clamp(18px, 2.6vw, 22px);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 18px;
+}
+
+// Price and the cart button at the bottom of phones.
+.sticky-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 -8px 24px rgba(10, 20, 64, 0.12);
+  transform: translateY(110%);
+  transition: transform 0.25s;
+
+  @media (max-width: 859px) {
+    display: flex;
+  }
+
+  &.shown {
+    transform: none;
+  }
+
+  .button {
+    flex: none;
+    min-height: 46px;
+    padding: 0 22px;
+  }
+}
+
+.sticky-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sticky-name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

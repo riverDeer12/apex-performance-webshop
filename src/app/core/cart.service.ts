@@ -35,6 +35,10 @@ export class CartService {
     // Promo code the customer applied, checked again in the cart and at checkout.
     readonly promoCode = signal<string | null>(read<string | null>(PromoKey, null));
 
+    // Panel that shows what was just added, with the way to the cart.
+    readonly drawerOpen = signal(false);
+    readonly lastAdded = signal<CartItem | null>(null);
+
     readonly count = computed(() => this.items().reduce((sum, x) => sum + x.quantity, 0));
     readonly subtotal = computed(() => this.items().reduce((sum, x) => sum + x.price * x.quantity, 0));
 
@@ -49,6 +53,9 @@ export class CartService {
 
         if (existing) this.setQuantity(item.variantId, existing.quantity + quantity);
         else this.items.update((items) => [...items, { ...item, quantity: Math.min(quantity, MaxQuantity) }]);
+
+        this.lastAdded.set({ ...item, quantity });
+        this.drawerOpen.set(true);
     }
 
     setQuantity(variantId: string, quantity: number): void {

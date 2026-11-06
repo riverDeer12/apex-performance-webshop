@@ -1,0 +1,40 @@
+<button type="button" class="icon-button toggle" (click)="openField()" aria-label="Pretraži">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+       aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+</button>
+
+<form class="field" [class.open]="open()" role="search" (submit)="$event.preventDefault(); submit()">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+       aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  <label for="headerSearch" class="visually-hidden">Što tražite?</label>
+  <input #input id="headerSearch" type="search" placeholder="Što tražite?" autocomplete="off" maxlength="80"
+         role="combobox" aria-controls="searchResults" [attr.aria-expanded]="showPanel()"
+         [attr.aria-activedescendant]="active() >= 0 ? 'searchResult' + active() : null"
+         [value]="text()" (input)="setText($any($event.target).value)" (focus)="onFocus()" (keydown)="onKey($event)">
+
+  @if (showPanel()) {
+    <div class="panel" id="searchResults" role="listbox">
+      @if (shown().length === 0) {
+        <p class="none">Nema proizvoda za „{{ text().trim() }}“.</p>
+      } @else {
+        @for (product of shown(); track product.id; let i = $index) {
+          <button type="button" class="result" role="option" [id]="'searchResult' + i" [class.active]="i === active()"
+                  [attr.aria-selected]="i === active()" (pointerdown)="$event.preventDefault()" (click)="openProduct(product)">
+            <span class="thumb">
+              @if (product.imageIds.length) {
+                <img [src]="api.imageUrl(product.imageIds[0])" alt="" loading="lazy">
+              }
+            </span>
+            <span class="text">
+              <span class="category">{{ product.category }}</span>
+              <span class="name">{{ product.name }}</span>
+            </span>
+            <span class="price">{{ formatPrice(product.price) }}</span>
+          </button>
+        }
+        <button type="submit" class="all" (pointerdown)="$event.preventDefault()">
+          Svi rezultati ({{ found().length }}) <span aria-hidden="true">→</span></button>
+      }
+    </div>
+  }
+</form>

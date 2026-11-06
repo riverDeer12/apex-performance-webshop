@@ -5,6 +5,7 @@ import { AccountService } from '../../core/account.service';
 import { SeoService } from '../../core/seo.service';
 import { Product } from '../../core/models';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { RecentlyViewedService } from '../../core/recently-viewed.service';
 import {
   CatalogFilter, FacetName, activeFilterCount, emptyFilter, facet, matches, swatchBackground,
 } from '../../core/catalog';
@@ -102,6 +103,12 @@ export class HomeComponent {
   readonly hasFilters = computed(() =>
     this.categories().length > 1 || this.colors().length > 1 || this.sizes().length > 1 || this.keywords().length > 0);
 
+  // Products the visitor opened before, newest first.
+  readonly recent = computed(() => {
+    const byId = new Map(this.all().map((x) => [x.id, x]));
+    return this.recentlyViewed.ids().map((id) => byId.get(id)).filter((x): x is Product => !!x).slice(0, 8);
+  });
+
   // Client discount offered in the shop, shown to visitors who are not logged in.
   readonly offeredDiscount = signal(0);
 
@@ -110,7 +117,7 @@ export class HomeComponent {
   readonly placeholders = [1, 2, 3, 4, 5, 6];
 
   constructor(public api: ShopApiService, public account: AccountService, private router: Router,
-              route: ActivatedRoute, seo: SeoService) {
+              route: ActivatedRoute, seo: SeoService, private recentlyViewed: RecentlyViewedService) {
     seo.set({ path: '/' });
 
     const params = route.snapshot.queryParamMap;

@@ -251,3 +251,25 @@
     accent-color: var(--blue);
   }
 }
+
+.free-progress {
+  margin: 4px 0 12px;
+
+  .free {
+    margin: 0 0 8px;
+  }
+
+  .bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--tint);
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      border-radius: 3px;
+      background: var(--blue);
+    }
+  }
+}

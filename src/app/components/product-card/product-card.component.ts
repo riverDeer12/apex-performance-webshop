@@ -4,6 +4,10 @@ import { ShopApiService } from '../../core/shop-api.service';
 import { AccountService } from '../../core/account.service';
 import { Product, clientUnitDiscount, formatPrice } from '../../core/models';
 import { colorHexes, compareSizes, swatchBackground } from '../../core/catalog';
+import { FavoritesService } from '../../core/favorites.service';
+
+// Products added in the last 30 days are marked "Novo".
+const NewDays = 30;
 
 /** Product in a list: picture, colors, name and price (the client price for clients). */
 @Component({
@@ -16,6 +20,11 @@ export class ProductCardComponent {
   readonly product = input.required<Product>();
 
   readonly soldOut = computed(() => this.product().variants.every((x) => !x.inStock));
+  readonly favorite = computed(() => this.favorites.ids().includes(this.product().id));
+  readonly isNew = computed(() => {
+    const created = this.product().createdAt;
+    return !!created && Date.now() - new Date(created).getTime() < NewDays * 86400000;
+  });
 
   // Up to five colors as swatches, the rest as "+2".
   readonly colors = computed(() => {
@@ -37,7 +46,7 @@ export class ProductCardComponent {
 
   readonly formatPrice = formatPrice;
 
-  constructor(public api: ShopApiService, private account: AccountService) {}
+  constructor(public api: ShopApiService, private account: AccountService, public favorites: FavoritesService) {}
 
   private isLight(name: string): boolean {
     return colorHexes(name).some((hex) => ['#ffffff', '#f3ead8', '#d9c7a8', '#c9ccd2', '#f2c94c', '#d7f542', '#a8e6cf'].includes(hex));

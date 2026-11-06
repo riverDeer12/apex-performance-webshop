@@ -86,8 +86,15 @@
             @if (shipping() === null) { … } @else if (shipping() === 0) { Besplatno } @else { {{ formatPrice(shipping()!) }} }
           </span>
         </div>
-        @if (missingForFree() > 0) {
-          <p class="free muted">Još {{ formatPrice(missingForFree()) }} do besplatne dostave.</p>
+        @if (settings(); as settings) {
+          <div class="free-progress">
+            @if (missingForFree() > 0) {
+              <p class="free muted">Još <strong>{{ formatPrice(missingForFree()) }}</strong> do besplatne dostave.</p>
+            } @else {
+              <p class="free"><strong>Ostvarili ste besplatnu dostavu.</strong></p>
+            }
+            <div class="bar"><span [style.width.%]="settings.freeShippingFrom > 0 ? (100 - missingForFree() / settings.freeShippingFrom * 100) : 100"></span></div>
+          </div>
         }
         <div class="line total"><span>Ukupno</span><span class="price">{{ formatPrice(total()) }}</span></div>
 

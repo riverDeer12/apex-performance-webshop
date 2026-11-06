@@ -573,3 +573,41 @@ fieldset {
     background: var(--blue);
   }
 }
+
+.recent {
+  margin-top: 56px;
+
+  h2 {
+    margin-bottom: 18px;
+    font-size: clamp(18px, 2.6vw, 22px);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.recent-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(170px, 46%);
+  gap: 12px;
+  overflow-x: auto;
+  margin: 0 -16px;
+  padding: 4px 16px 16px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  > * {
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 640px) {
+    grid-auto-columns: minmax(200px, 30%);
+    gap: 18px;
+  }
+
+  @media (min-width: 1024px) {
+    grid-auto-columns: calc((100% - 54px) / 4);
+    margin: 0;
+    padding: 4px 0 16px;
+  }
+}

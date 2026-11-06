@@ -1,0 +1,36 @@
+<div class="backdrop" (click)="close()"></div>
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="sizeGuideTitle">
+  <div class="head">
+    <div>
+      <p class="eyebrow">Vodič za veličine</p>
+      <h2 id="sizeGuideTitle">{{ guide().title }}</h2>
+    </div>
+    <button type="button" class="close" (click)="close()" aria-label="Zatvori">✕</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          @for (column of guide().columns; track column) { <th scope="col">{{ column }}</th> }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of guide().rows; track row[0]) {
+          <tr>
+            @for (cell of row; track $index) {
+              @if ($first) { <th scope="row">{{ cell }}</th> } @else { <td>{{ cell }}</td> }
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Kako izmjeriti</h3>
+  <ul>
+    @for (line of guide().how; track line) { <li>{{ line }}</li> }
+  </ul>
+  <p class="note">Mjere su okvirne, kroj se razlikuje od modela do modela. Ako ste između dvije veličine,
+    odaberite veću, a za tijesniji kroj manju.</p>
+</div>

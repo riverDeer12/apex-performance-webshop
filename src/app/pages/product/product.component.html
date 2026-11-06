@@ -36,7 +36,10 @@
 
         @if (sizes().length > 0) {
           <div class="option">
-            <span class="label">Veličina @if (size()) { <span class="picked">· {{ size() }}</span> }</span>
+            <div class="label-row">
+              <span class="label">Veličina @if (size()) { <span class="picked">· {{ size() }}</span> }</span>
+              <button type="button" class="link-button" (click)="sizeGuideOpen.set(true)">Vodič za veličine</button>
+            </div>
             <div class="choices">
               @for (item of sizes(); track item) {
                 <button type="button" [class.selected]="size() === item"
@@ -73,7 +76,7 @@
           }
         </p>
 
-        <div class="buy">
+        <div class="buy" #buy>
           <div class="quantity" aria-label="Količina">
             <button type="button" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1" aria-label="Manje">−</button>
             <span>{{ quantity() }}</span>
@@ -81,6 +84,11 @@
           </div>
           <button type="button" class="button" [disabled]="!variant()?.inStock" (click)="addToCart()">
             Dodaj u košaricu <span class="arrow" aria-hidden="true">→</span>
+          </button>
+          <button type="button" class="heart" [class.on]="favorite()" (click)="favorites.toggle(product.id)"
+                  [attr.aria-pressed]="favorite()" [attr.aria-label]="favorite() ? 'Ukloni iz favorita' : 'Dodaj u favorite'">
+            <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3.2A4.8 4.8 0 0 1 21 11c-2 4.6-9 9-9 9z"/></svg>
           </button>
         </div>
 
@@ -108,13 +116,30 @@
           }
         }
 
-        @if (added()) {
-          <div class="added">
-            ✓ Dodano u košaricu. <a routerLink="/kosarica">Pogledaj košaricu</a>
-          </div>
-        }
 
-        <div class="description">{{ product.description }}</div>
+        <div class="accordion">
+          <details open>
+            <summary>Opis</summary>
+            <div class="description">{{ product.description }}</div>
+          </details>
+          <details>
+            <summary>Dostava i povrat</summary>
+            <ul>
+              <li>Dostava u BoxNow paketomat po izboru, diljem Hrvatske.</li>
+              @if (settings(); as settings) {
+                <li>Dostava {{ formatPrice(settings.shippingPrice) }}, besplatna za narudžbe od {{ formatPrice(settings.freeShippingFrom) }}.</li>
+              }
+              <li>Proizvod možete vratiti u 14 dana bez navođenja razloga. <a routerLink="/povrat-i-reklamacije">Povrat i reklamacije</a></li>
+            </ul>
+          </details>
+          <details>
+            <summary>Plaćanje</summary>
+            <ul>
+              <li>Karticom, na sigurnoj Stripe stranici za plaćanje.</li>
+              <li>Fiskalizirani račun stiže e-mailom nakon plaćanja.</li>
+            </ul>
+          </details>
+        </div>
 
         @if (product.keywords?.length) {
           <div class="keywords" aria-label="Ključne riječi">
@@ -136,11 +161,6 @@
           <p class="muted small share-message">{{ message }}</p>
         }
 
-        <ul class="facts muted">
-          <li>Dostava u BoxNow paketomat</li>
-          <li>Plaćanje karticom preko Stripea</li>
-          <li><a routerLink="/povrat-i-reklamacije">Povrat u 14 dana</a></li>
-        </ul>
       </div>
     </div>
 
@@ -158,6 +178,33 @@
         </div>
       </section>
     }
+
+    @if (recent().length > 0) {
+      <section class="suggested" aria-labelledby="recentTitle">
+        <div class="suggested-head">
+          <h2 id="recentTitle" class="small-title">Nedavno pregledano</h2>
+        </div>
+        <div class="suggested-row">
+          @for (item of recent(); track item.id) {
+            <app-product-card [product]="item" />
+          }
+        </div>
+      </section>
+    }
+
+    @if (sizeGuideOpen()) {
+      <app-size-guide [category]="product.category" [name]="product.name" (closed)="sizeGuideOpen.set(false)" />
+    }
+
+    <div class="sticky-bar" [class.shown]="stickyBar()" [attr.aria-hidden]="!stickyBar()">
+      <div class="sticky-text">
+        <span class="sticky-name">{{ product.name }}</span>
+        <span class="price">{{ formatPrice(clientPrice() ?? product.price) }}@if (variant(); as variant) { · {{ variantName(variant) }} }</span>
+      </div>
+      <button type="button" class="button" [tabindex]="stickyBar() ? 0 : -1" (click)="stickyAdd()"
+              [disabled]="variant() !== null && !variant()!.inStock">
+        {{ variant()?.inStock ? 'Dodaj' : 'Odaberi' }}</button>
+    </div>
   } @else if (notFound()) {
     <div class="center">
       <h1>Proizvod nije pronađen</h1>

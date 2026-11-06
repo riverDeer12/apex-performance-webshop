@@ -2,13 +2,25 @@
   <div class="test-banner">TEST · plaćanje testnim karticama, npr. 4242 4242 4242 4242</div>
 }
 
+<app-announcement-bar />
+
 <header class="header">
   <div class="container header-inner">
     <a routerLink="/" class="logo" aria-label="Apex Performance Shop">
       <img src="logo.png" width="56" height="25" alt="">
-      <span>APEX PERFORMANCE <b>SHOP</b></span>
+      <span class="logo-text"><span>APEX PERFORMANCE</span> <b>SHOP</b></span>
     </a>
     <nav class="nav">
+    <app-header-search />
+    <a routerLink="/favoriti" class="icon-link" aria-label="Favoriti">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3.2A4.8 4.8 0 0 1 21 11c-2 4.6-9 9-9 9z"/>
+      </svg>
+      @if (favorites.count() > 0) {
+        <span class="badge">{{ favorites.count() }}</span>
+      }
+    </a>
     @if (account.me(); as me) {
       <a routerLink="/moje-narudzbe" class="account-link" [attr.aria-label]="'Moje narudžbe, ' + me.name">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -43,6 +55,8 @@
 <main>
   <router-outlet />
 </main>
+
+<app-cart-drawer />
 
 <footer class="footer">
   <div class="container footer-inner">

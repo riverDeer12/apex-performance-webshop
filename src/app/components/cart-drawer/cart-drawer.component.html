@@ -1,0 +1,49 @@
+<div class="backdrop" [class.open]="cart.drawerOpen()" (click)="close()"></div>
+<aside class="drawer" [class.open]="cart.drawerOpen()" role="dialog" aria-modal="true" aria-labelledby="drawerTitle"
+       [attr.aria-hidden]="!cart.drawerOpen()">
+  <div class="head">
+    <h2 id="drawerTitle"><span class="check" aria-hidden="true">✓</span> Dodano u košaricu</h2>
+    <button type="button" class="close" (click)="close()" aria-label="Zatvori">✕</button>
+  </div>
+
+  @if (cart.lastAdded(); as item) {
+    <div class="item">
+      <div class="thumb">
+        @if (item.imageId) {
+          <img [src]="api.imageUrl(item.imageId)" alt="">
+        } @else {
+          <img src="logo.png" alt="" class="placeholder">
+        }
+      </div>
+      <div>
+        <p class="name">{{ item.name }}</p>
+        @if (item.variantName) {
+          <p class="muted small">{{ item.variantName }}</p>
+        }
+        <p class="muted small">{{ item.quantity }} × {{ formatPrice(item.price) }}</p>
+      </div>
+    </div>
+  }
+
+  <div class="summary">
+    <div class="row"><span>U košarici ({{ cart.count() }})</span><strong>{{ formatPrice(cart.subtotal()) }}</strong></div>
+
+    @if (missingForFree() !== null) {
+      <div class="free">
+        @if (missingForFree()! > 0) {
+          <p>Još <strong>{{ formatPrice(missingForFree()!) }}</strong> do besplatne dostave</p>
+        } @else {
+          <p><strong>Ostvarili ste besplatnu dostavu</strong></p>
+        }
+        <div class="bar" role="progressbar" [attr.aria-valuenow]="freeProgress()" aria-valuemin="0" aria-valuemax="100">
+          <span [style.width.%]="freeProgress()"></span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="actions">
+    <a routerLink="/kosarica" class="button wide">Pogledaj košaricu <span class="arrow" aria-hidden="true">→</span></a>
+    <button type="button" class="button ghost wide" (click)="close()">Nastavi kupnju</button>
+  </div>
+</aside>

@@ -200,4 +200,15 @@
       </div>
     </div>
   }
+
+  @if (recent().length > 0) {
+    <section class="recent" aria-labelledby="recentTitle">
+      <h2 id="recentTitle">Nedavno pregledano</h2>
+      <div class="recent-row">
+        @for (product of recent(); track product.id) {
+          <app-product-card [product]="product" />
+        }
+      </div>
+    </section>
+  }
 </section>

@@ -1,0 +1,155 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(10, 20, 64, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: min(420px, 100%);
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+  background: var(--background);
+  box-shadow: -12px 0 32px rgba(10, 20, 64, 0.15);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0.25s;
+
+  &.open {
+    transform: none;
+    visibility: visible;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+}
+
+.check {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  font-family: "Lato", sans-serif;
+  font-size: 14px;
+}
+
+.close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.item {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--shadow);
+
+  p {
+    margin: 0 0 2px;
+  }
+}
+
+.thumb {
+  flex: none;
+  width: 76px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--tint-soft);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    object-fit: contain;
+    padding: 20%;
+    opacity: 0.2;
+  }
+}
+
+.name {
+  font-weight: 700;
+}
+
+.small {
+  font-size: 14px;
+}
+
+.summary {
+  padding: 16px;
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.free {
+  margin-top: 14px;
+
+  p {
+    margin: 0 0 8px;
+    font-size: 14px;
+  }
+}
+
+.bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--tint);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--blue);
+    transition: width 0.4s;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}

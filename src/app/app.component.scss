@@ -30,6 +30,7 @@ main {
 }
 
 .header-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -51,14 +52,25 @@ main {
     font-weight: 400;
   }
 
-  @media (max-width: 480px) {
+  // Two lines on phones, so the icons keep their room.
+  @media (max-width: 600px) {
+    flex: 0 1 auto;
+    min-width: 0;
     gap: 8px;
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 0.14em;
+    line-height: 1.35;
 
     img {
-      width: 40px;
+      flex: none;
+      width: 36px;
       height: auto;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      white-space: nowrap;
     }
   }
 }
@@ -66,7 +78,32 @@ main {
 .nav {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+
+  @media (max-width: 480px) {
+    gap: 0;
+  }
+}
+
+.icon-link {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--ink);
+
+  .badge {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    font-size: 11px;
+    line-height: 18px;
+  }
 }
 
 .account-link {
@@ -174,4 +211,39 @@ main {
   gap: 8px 20px;
   margin-top: 28px;
   font-size: 14px;
+}
+
+// Narrow phones: tighter logo and icons.
+@media (max-width: 400px) {
+  .logo {
+    gap: 6px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+
+    img {
+      width: 30px;
+    }
+  }
+
+  .icon-link,
+  .account-link,
+  .cart-link {
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 370px) {
+  .logo {
+    letter-spacing: 0;
+  }
+}
+
+// Very narrow phones (320 px): the text alone, the icons keep their room.
+@media (max-width: 340px) {
+  .logo img {
+    display: none;
+  }
 }
