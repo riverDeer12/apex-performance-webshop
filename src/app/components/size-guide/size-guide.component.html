@@ -8,6 +8,9 @@
     <button type="button" class="close" (click)="close()" aria-label="Zatvori">✕</button>
   </div>
 
+  <p class="body-note"><strong>Tablica prikazuje tjelesne mjere</strong>, ne mjere samog proizvoda. Izmjerite sebe
+    (ne odjeću) i odaberite veličinu u čiji raspon upadate.</p>
+
   <div class="table-wrap">
     <table>
       <thead>
@@ -17,7 +20,7 @@
       </thead>
       <tbody>
         @for (row of guide().rows; track row[0]) {
-          <tr>
+          <tr [class.own]="isOwn(row)">
             @for (cell of row; track $index) {
               @if ($first) { <th scope="row">{{ cell }}</th> } @else { <td>{{ cell }}</td> }
             }

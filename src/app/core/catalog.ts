@@ -1,4 +1,4 @@
-import { Product } from './models';
+import { Gender, Product } from './models';
 
 /**
  * Filtering and suggestions of the catalog. The shop loads all products at
@@ -17,16 +17,58 @@ export interface CatalogFilter {
   keywords: string[];
   // Only products with a matching size and color in stock.
   inStockOnly: boolean;
+  // Women's or men's products; unisex products and accessories are in both.
+  gender: Exclude<Gender, 'unisex'> | null;
+  // Price range in euros, null for no limit.
+  priceMin: number | null;
+  priceMax: number | null;
 }
 
 export type FacetName = 'categories' | 'colors' | 'sizes' | 'keywords';
 
-export const emptyFilter = (): CatalogFilter =>
-  ({ search: '', categories: [], colors: [], sizes: [], keywords: [], inStockOnly: false });
+export const emptyFilter = (): CatalogFilter => ({
+  search: '', categories: [], colors: [], sizes: [], keywords: [], inStockOnly: false,
+  gender: null, priceMin: null, priceMax: null,
+});
 
+// Filters in the side panel; the gender is picked above the list.
 export const activeFilterCount = (filter: CatalogFilter) =>
   filter.categories.length + filter.colors.length + filter.sizes.length + filter.keywords.length +
-  (filter.inStockOnly ? 1 : 0);
+  (filter.inStockOnly ? 1 : 0) + (filter.priceMin !== null || filter.priceMax !== null ? 1 : 0);
+
+// Keywords --------------------------------------------------------------------------
+
+// Groups of keywords, written in the administration as "materijal: pamuk".
+export const KeywordGroups: { name: string; title: string }[] = [
+  { name: 'materijal', title: 'Materijal' },
+  { name: 'kolekcija', title: 'Kolekcija' },
+  { name: 'aktivnost', title: 'Aktivnost' },
+  { name: 'sezona', title: 'Sezona' },
+  { name: '', title: 'Ključne riječi' },
+];
+
+const keywordParts = (keyword: string): [string, string] => {
+  const match = /^([^:]+):\s*(.+)$/.exec(keyword);
+  const group = match?.[1].trim().toLowerCase();
+  return match && KeywordGroups.some((x) => x.name === group) ? [group!, match[2].trim()] : ['', keyword];
+};
+
+// "materijal" for "materijal: pamuk", "" for keywords without a group.
+export const keywordGroup = (keyword: string) => keywordParts(keyword)[0];
+// "pamuk" for "materijal: pamuk".
+export const keywordValue = (keyword: string) => keywordParts(keyword)[1];
+
+// Sizes --------------------------------------------------------------------------
+
+const LetterSizes = ['xxxs', '3xs', 'xxs', '2xs', 'xs', 's', 's/m', 'm', 'm/l', 'l', 'l/xl', 'xl', 'xxl', '2xl', 'xxxl', '3xl', '4xl', '5xl'];
+
+// Letters (S, M, L), numbers (38, 42), or a range like socks (39–42) and one size (Uni).
+export function sizeKind(size: string): 'letters' | 'numbers' | 'other' {
+  const text = normalize(size).replace(/\s+/g, '');
+  if (LetterSizes.includes(text)) return 'letters';
+  if (/^\d+([.,]\d+)?$/.test(text)) return 'numbers';
+  return 'other';
+}
 
 const productText = (product: Product) =>
   normalize(`${product.name} ${product.category} ${product.description} ${(product.keywords ?? []).join(' ')}`);
@@ -46,7 +88,19 @@ export function matches(product: Product, filter: CatalogFilter): boolean {
 
   if (filter.categories.length && !filter.categories.includes(product.category)) return false;
 
-  if (filter.keywords.length && !(product.keywords ?? []).some((x) => filter.keywords.includes(x))) return false;
+  if (filter.gender && product.gender && product.gender !== 'unisex' && product.gender !== filter.gender) return false;
+
+  if (filter.priceMin !== null && product.price < filter.priceMin) return false;
+  if (filter.priceMax !== null && product.price > filter.priceMax) return false;
+
+  // Keywords of one group are alternatives, every group picked has to match.
+  if (filter.keywords.length) {
+    const own = product.keywords ?? [];
+    const groups = new Set(filter.keywords.map(keywordGroup));
+    for (const group of groups) {
+      if (!filter.keywords.some((x) => keywordGroup(x) === group && own.includes(x))) return false;
+    }
+  }
 
   if (filter.colors.length || filter.sizes.length || filter.inStockOnly) {
     const colors = filter.colors.map(normalize);
@@ -110,10 +164,6 @@ function unique(values: (string | null | undefined)[]): string[] {
   }
   return [...seen.values()];
 }
-
-// Sizes --------------------------------------------------------------------------
-
-const LetterSizes = ['xxxs', '3xs', 'xxs', '2xs', 'xs', 's', 's/m', 'm', 'm/l', 'l', 'l/xl', 'xl', 'xxl', '2xl', 'xxxl', '3xl', '4xl', '5xl'];
 
 // XS, S, M, L, XL first, then numbers (shoes, 38, 39 ...), then the rest (Uni).
 export function compareSizes(a: string, b: string): number {

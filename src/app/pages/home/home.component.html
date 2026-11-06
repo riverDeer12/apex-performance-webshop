@@ -1,23 +1,50 @@
 <section class="container">
-  <header class="page-title">
-    <p class="brand-eyebrow">APEX PERFORMANCE</p>
-    <h1>Shop</h1>
-    <p>Odjeća i oprema studija Apex Performance</p>
-  </header>
-
   <div class="banner">
-    <div>
+    <div class="banner-copy">
       <p class="banner-eyebrow">Apex Performance Shop</p>
       <h2>Treniraj u opremi koju nosimo i mi.</h2>
-      <p class="banner-text">Dostava u BoxNow paketomat diljem Hrvatske · povrat u 14 dana</p>
+      <ul class="banner-points">
+        <li>BoxNow paketomat diljem Hrvatske</li>
+        <li>Povrat u 14 dana</li>
+        <li>Plaćanje karticom</li>
+      </ul>
+      @if (account.clientDiscount() > 0) {
+        <p class="banner-badge">Vaš popust za članove: <strong>{{ account.clientDiscount() }} %</strong></p>
+      } @else if (offeredDiscount() > 0 && !account.isLoggedIn()) {
+        <a routerLink="/prijava" class="banner-badge link">Član Apex Performance-a? Prijavite se za
+          <strong>{{ offeredDiscount() }} % popusta</strong> <span aria-hidden="true">→</span></a>
+      }
     </div>
-    @if (account.clientDiscount() > 0) {
-      <p class="banner-badge">Vaš popust za članove: <strong>{{ account.clientDiscount() }} %</strong></p>
-    } @else if (offeredDiscount() > 0 && !account.isLoggedIn()) {
-      <a routerLink="/prijava" class="banner-badge link">Član Apex Performance-a? Prijavite se za
-        <strong>{{ offeredDiscount() }} % popusta</strong> <span aria-hidden="true">→</span></a>
+    @if (bannerProducts().length) {
+      <div class="banner-pictures" aria-hidden="true">
+        @for (product of bannerProducts(); track product.id) {
+          <a [routerLink]="['/proizvod', product.slug]" tabindex="-1">
+            <img [src]="api.imageUrl(product.imageIds[0])" alt="" loading="lazy">
+          </a>
+        }
+      </div>
     }
   </div>
+
+  <header class="page-title">
+    @if (breadcrumbs().length) {
+      <nav class="breadcrumbs" aria-label="Putanja">
+        <ol>
+          <li><a routerLink="/">Shop</a></li>
+          @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
+            @if (last) {
+              <li aria-current="page">{{ crumb.label }}</li>
+            } @else {
+              <li><a routerLink="/" [queryParams]="{ za: crumb.gender === 'women' ? 'zene' : 'muskarci' }">{{ crumb.label }}</a></li>
+            }
+          }
+        </ol>
+      </nav>
+    } @else {
+      <p class="brand-eyebrow">APEX PERFORMANCE</p>
+    }
+    <h1>{{ title() }}</h1>
+  </header>
 
   @if (failed()) {
     <p class="notice error">Proizvodi se trenutno ne mogu učitati. Pokušajte ponovno za nekoliko minuta.</p>
@@ -39,11 +66,12 @@
                autocomplete="off" maxlength="80" [value]="filter().search" (input)="setSearch($any($event.target).value)">
       </div>
       @if (hasFilters()) {
-        <button type="button" class="button secondary filters-button" (click)="filtersOpen.set(true)"
+        <button type="button" class="button secondary filters-button" (click)="toggleFilters()"
                 aria-controls="filters" [attr.aria-expanded]="filtersOpen()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
-          Filtri
+          <span class="mobile-only">Filtri</span>
+          <span class="desktop-only">{{ filtersHidden() ? 'Prikaži filtre' : 'Sakrij filtre' }}</span>
           @if (activeCount()) {
             <span class="count-badge">{{ activeCount() }}</span>
           }
@@ -59,6 +87,16 @@
       </label>
     </div>
 
+    @if (genders().length) {
+      <div class="gender-tabs" role="group" aria-label="Za koga">
+        <button type="button" [class.active]="!filter().gender" (click)="pickGender(null)">Sve</button>
+        @for (item of genders(); track item.value) {
+          <button type="button" [class.active]="filter().gender === item.value" (click)="pickGender(item.value)"
+                  [attr.aria-pressed]="filter().gender === item.value">{{ item.label }}</button>
+        }
+      </div>
+    }
+
     @if (categories().length > 1) {
       <div class="category-chips" role="group" aria-label="Kategorije">
         <button type="button" class="chip" [class.active]="filter().categories.length === 0" (click)="pickCategory(null)">Sve</button>
@@ -69,10 +107,10 @@
       </div>
     }
 
-    <div class="layout" [class.no-filters]="!hasFilters()">
+    <div class="layout" [class.no-filters]="!hasFilters() || filtersHidden()">
       @if (hasFilters()) {
         <div class="backdrop" [class.open]="filtersOpen()" (click)="filtersOpen.set(false)"></div>
-        <aside id="filters" class="filters" [class.open]="filtersOpen()" aria-label="Filtri">
+        <aside id="filters" class="filters" [class.open]="filtersOpen()" [class.hidden-wide]="filtersHidden()" aria-label="Filtri">
           <div class="filters-head">
             <h2>Filtri</h2>
             <button type="button" class="close" (click)="filtersOpen.set(false)" aria-label="Zatvori filtre">✕</button>
@@ -114,31 +152,56 @@
             @if (sizes().length > 1) {
               <fieldset>
                 <legend class="section-label">{{ facetTitles.sizes }}</legend>
-                <div class="size-grid">
-                  @for (item of sizes(); track item.value) {
-                    <button type="button" class="size-option" [class.active]="isPicked('sizes', item.value)"
-                            [disabled]="item.count === 0 && !isPicked('sizes', item.value)"
-                            [attr.aria-pressed]="isPicked('sizes', item.value)" (click)="toggle('sizes', item.value)">
-                      {{ item.value }}</button>
+                @for (group of sizeGroups(); track group.kind) {
+                  @if (sizeGroups().length > 1) {
+                    <p class="sub-label">{{ group.title }}</p>
                   }
-                </div>
+                  <div class="size-grid">
+                    @for (item of group.values; track item.value) {
+                      <button type="button" class="size-option" [class.active]="isPicked('sizes', item.value)"
+                              [disabled]="item.count === 0 && !isPicked('sizes', item.value)"
+                              [attr.aria-pressed]="isPicked('sizes', item.value)" (click)="toggle('sizes', item.value)">
+                        {{ item.value }}</button>
+                    }
+                  </div>
+                }
               </fieldset>
             }
 
-            @if (keywords().length > 0) {
+            @if (priceBounds(); as bounds) {
+              @if (bounds.max > bounds.min) {
+                <fieldset>
+                  <legend class="section-label">Cijena (€)</legend>
+                  <div class="price-range">
+                    <label>
+                      <span>od</span>
+                      <input type="number" inputmode="decimal" min="0" [placeholder]="bounds.min"
+                             [value]="filter().priceMin ?? ''" (change)="setPrice('priceMin', $any($event.target).value)">
+                    </label>
+                    <span class="dash" aria-hidden="true">–</span>
+                    <label>
+                      <span>do</span>
+                      <input type="number" inputmode="decimal" min="0" [placeholder]="bounds.max"
+                             [value]="filter().priceMax ?? ''" (change)="setPrice('priceMax', $any($event.target).value)">
+                    </label>
+                  </div>
+                </fieldset>
+              }
+            }
+
+            @for (group of keywordGroups(); track group.name) {
               <fieldset>
-                <legend class="section-label">{{ facetTitles.keywords }}</legend>
+                <legend class="section-label">{{ group.title }}</legend>
                 <div class="keyword-list">
-                  @for (item of keywords(); track item.value) {
+                  @for (item of group.values; track item.value) {
                     <button type="button" class="chip" [class.active]="isPicked('keywords', item.value)"
                             [disabled]="item.count === 0 && !isPicked('keywords', item.value)"
                             [attr.aria-pressed]="isPicked('keywords', item.value)" (click)="toggle('keywords', item.value)">
-                      #{{ item.value }}</button>
+                      {{ group.name ? item.label : '#' + item.label }}</button>
                   }
                 </div>
-                @if (moreKeywords() > 0) {
-                  <button type="button" class="link-button" (click)="allKeywords.set(!allKeywords())">
-                    {{ allKeywords() ? 'Prikaži manje' : 'Prikaži sve (' + (moreKeywords() + 12) + ')' }}</button>
+                @if (group.more > 0) {
+                  <button type="button" class="link-button" (click)="allKeywords.set(true)">Prikaži sve (+{{ group.more }})</button>
                 }
               </fieldset>
             }

@@ -9,7 +9,7 @@ import { Product, ShopSettings, Variant, clientUnitDiscount, formatPrice, varian
 import { FavoritesService } from '../../core/favorites.service';
 import { RecentlyViewedService } from '../../core/recently-viewed.service';
 import { SizeGuideComponent } from '../../components/size-guide/size-guide.component';
-import { compareSizes, suggestions, swatchBackground } from '../../core/catalog';
+import { compareSizes, keywordValue, suggestions, swatchBackground } from '../../core/catalog';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 
 /**
@@ -112,9 +112,10 @@ export class ProductComponent {
           this.imageIndex.set(0);
           this.quantity.set(1);
           this.added.set(false);
-          // A single size or color is chosen for the customer.
-          this.size.set(this.sizes().length === 1 ? this.sizes()[0] : null);
-          this.color.set(this.colors().length === 1 ? this.colors()[0] : null);
+          // A single size or color is chosen for the customer, a favorite comes with the ones saved with it.
+          const saved = this.favorites.item(product.id);
+          this.size.set(this.sizes().length === 1 ? this.sizes()[0] : saved?.size && this.sizes().includes(saved.size) ? saved.size : null);
+          this.color.set(this.colors().length === 1 ? this.colors()[0] : saved?.color && this.colors().includes(saved.color) ? saved.color : null);
           this.alertState.set('idle');
           this.otherEmail.set(false);
           this.setSeo(product);
@@ -128,6 +129,32 @@ export class ProductComponent {
   available(size: string | null, color: string | null): boolean {
     return (this.product()?.variants ?? []).some((x) =>
       x.inStock && (size === null || x.size === size) && (color === null || x.color === color));
+  }
+
+  pickSize(size: string): void {
+    this.size.set(size);
+    this.updateFavorite();
+  }
+
+  pickColor(color: string): void {
+    this.color.set(color);
+    this.updateFavorite();
+  }
+
+  toggleFavorite(): void {
+    const product = this.product();
+    if (product) this.favorites.toggle(product, this.size(), this.color());
+  }
+
+  // A favorite keeps the size and color picked last.
+  private updateFavorite(): void {
+    const product = this.product();
+    if (product && this.favorite()) this.favorites.save(product, this.size(), this.color());
+  }
+
+  // "materijal: pamuk" is shown as "pamuk".
+  keywordLabel(keyword: string): string {
+    return keywordValue(keyword);
   }
 
   @HostListener('window:scroll')
@@ -211,24 +238,34 @@ export class ProductComponent {
       title: product.name,
       description,
       path,
-      // Read by search engines for the product's price and availability.
+      // Read by search engines for the product's price and availability, and the path to it.
       jsonLd: {
         '@context': 'https://schema.org',
-        '@type': 'Product',
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        image: product.imageIds.map((id) => this.api.imageUrl(id)),
-        brand: { '@type': 'Brand', name: 'Apex Performance' },
-        offers: {
-          '@type': 'Offer',
-          url: environment.siteUrl + path,
-          priceCurrency: 'EUR',
-          price: product.price.toFixed(2),
-          availability: product.variants.some((x) => x.inStock)
-            ? 'https://schema.org/InStock'
-            : 'https://schema.org/OutOfStock',
-        },
+        '@graph': [{
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Shop', item: environment.siteUrl + '/' },
+            { '@type': 'ListItem', position: 2, name: product.category,
+              item: environment.siteUrl + '/?kategorija=' + encodeURIComponent(product.category) },
+            { '@type': 'ListItem', position: 3, name: product.name },
+          ],
+        }, {
+          '@type': 'Product',
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          image: product.imageIds.map((id) => this.api.imageUrl(id)),
+          brand: { '@type': 'Brand', name: 'Apex Performance' },
+          offers: {
+            '@type': 'Offer',
+            url: environment.siteUrl + path,
+            priceCurrency: 'EUR',
+            price: product.price.toFixed(2),
+            availability: product.variants.some((x) => x.inStock)
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+          },
+        }],
       },
     });
   }

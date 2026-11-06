@@ -1,6 +1,12 @@
 <section class="container page">
   @if (product(); as product) {
-    <a routerLink="/" class="back">← Svi proizvodi</a>
+    <nav class="breadcrumbs" aria-label="Putanja">
+      <ol>
+        <li><a routerLink="/">Shop</a></li>
+        <li><a routerLink="/" [queryParams]="{ kategorija: product.category }">{{ product.category }}</a></li>
+        <li aria-current="page">{{ product.name }}</li>
+      </ol>
+    </nav>
 
     <div class="layout">
       <div class="gallery">
@@ -26,8 +32,8 @@
         <h1>{{ product.name }}</h1>
         @if (clientPrice(); as clientPrice) {
           <p class="price big">
+            <span class="sale">{{ formatPrice(clientPrice) }}</span>
             <s class="muted old">{{ formatPrice(product.price) }}</s>
-            {{ formatPrice(clientPrice) }}
             <span class="client-tag">cijena za članove</span>
           </p>
         } @else {
@@ -43,7 +49,7 @@
             <div class="choices">
               @for (item of sizes(); track item) {
                 <button type="button" [class.selected]="size() === item"
-                        [class.unavailable]="!available(item, color())" (click)="size.set(item)"
+                        [class.unavailable]="!available(item, color())" (click)="pickSize(item)"
                         [attr.title]="available(item, color()) ? null : 'Rasprodano: odaberite i javit ćemo vam'">{{ item }}</button>
               }
             </div>
@@ -56,7 +62,7 @@
             <div class="choices">
               @for (item of colorSwatches(); track item.name) {
                 <button type="button" class="color" [class.selected]="color() === item.name"
-                        [class.unavailable]="!available(size(), item.name)" (click)="color.set(item.name)"
+                        [class.unavailable]="!available(size(), item.name)" (click)="pickColor(item.name)"
                         [attr.title]="available(size(), item.name) ? null : 'Rasprodano: odaberite i javit ćemo vam'">
                   <span class="dot" [style.background]="item.background" aria-hidden="true"></span>{{ item.name }}</button>
               }
@@ -124,8 +130,8 @@
           <button type="button" class="button" [disabled]="!variant()?.inStock" (click)="addToCart()">
             Dodaj u košaricu <span class="arrow" aria-hidden="true">→</span>
           </button>
-          <button type="button" class="heart" [class.on]="favorite()" (click)="favorites.toggle(product)"
-                  [attr.aria-pressed]="favorite()" [attr.aria-label]="favorite() ? 'Ukloni iz favorita' : 'Dodaj u favorite'">
+          <button type="button" class="heart" [class.on]="favorite()" (click)="toggleFavorite()"
+                  [attr.aria-pressed]="favorite()" [attr.aria-label]="favorite() ? 'Ukloni iz favorita' : 'Spremi u favorite s odabranom veličinom i bojom'">
             <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                  stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3.2A4.8 4.8 0 0 1 21 11c-2 4.6-9 9-9 9z"/></svg>
           </button>
@@ -133,34 +139,38 @@
 
 
 
+        <ul class="info-strip" aria-label="Dostava, povrat i plaćanje">
+          <li>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>
+            <span><strong>Dostava u BoxNow paketomat</strong>
+              @if (settings(); as settings) {
+                {{ formatPrice(settings.shippingPrice) }}, besplatna od {{ formatPrice(settings.freeShippingFrom) }}
+              } @else { diljem Hrvatske }</span>
+          </li>
+          <li>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            <span><strong>Povrat u 14 dana</strong> bez navođenja razloga · <a routerLink="/povrat-i-reklamacije">uvjeti</a></span>
+          </li>
+          <li>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></svg>
+            <span><strong>Plaćanje karticom</strong> na sigurnoj Stripe stranici, račun stiže e-mailom</span>
+          </li>
+        </ul>
+
         <div class="accordion">
           <details open>
             <summary>Opis</summary>
             <div class="description">{{ product.description }}</div>
-          </details>
-          <details>
-            <summary>Dostava i povrat</summary>
-            <ul>
-              <li>Dostava u BoxNow paketomat po izboru, diljem Hrvatske.</li>
-              @if (settings(); as settings) {
-                <li>Dostava {{ formatPrice(settings.shippingPrice) }}, besplatna za narudžbe od {{ formatPrice(settings.freeShippingFrom) }}.</li>
-              }
-              <li>Proizvod možete vratiti u 14 dana bez navođenja razloga. <a routerLink="/povrat-i-reklamacije">Povrat i reklamacije</a></li>
-            </ul>
-          </details>
-          <details>
-            <summary>Plaćanje</summary>
-            <ul>
-              <li>Karticom, na sigurnoj Stripe stranici za plaćanje.</li>
-              <li>Fiskalizirani račun stiže e-mailom nakon plaćanja.</li>
-            </ul>
           </details>
         </div>
 
         @if (product.keywords?.length) {
           <div class="keywords" aria-label="Ključne riječi">
             @for (keyword of product.keywords!; track keyword) {
-              <a class="chip" routerLink="/" [queryParams]="{ oznaka: keyword }">#{{ keyword }}</a>
+              <a class="chip" routerLink="/" [queryParams]="{ oznaka: keyword }">#{{ keywordLabel(keyword) }}</a>
             }
           </div>
         }
@@ -209,7 +219,8 @@
     }
 
     @if (sizeGuideOpen()) {
-      <app-size-guide [category]="product.category" [name]="product.name" (closed)="sizeGuideOpen.set(false)" />
+      <app-size-guide [category]="product.category" [name]="product.name" [sizes]="sizes()" [gender]="product.gender ?? null"
+                      (closed)="sizeGuideOpen.set(false)" />
     }
 
     <div class="sticky-bar" [class.shown]="stickyBar()" [attr.aria-hidden]="!stickyBar()">

@@ -7,15 +7,29 @@ import { Product } from '../../core/models';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { RecentlyViewedService } from '../../core/recently-viewed.service';
 import {
-  CatalogFilter, FacetName, activeFilterCount, emptyFilter, facet, matches, swatchBackground,
+  CatalogFilter, FacetName, KeywordGroups, activeFilterCount, emptyFilter, facet, keywordGroup, keywordValue, matches,
+  sizeKind, swatchBackground,
 } from '../../core/catalog';
 
 export type ProductSort = 'preporuceno' | 'cijena-rastuce' | 'cijena-padajuce' | 'najnovije';
 
 // Products shown at first and added by "Prikaži još".
 const PageSize = 24;
-// Keywords shown before "Prikaži sve".
+// Keywords of a group shown before "Prikaži sve".
 const KeywordsShown = 12;
+// The filter column hidden on wide screens, remembered in the browser.
+const FiltersHiddenKey = 'apex-shop-filters-hidden';
+
+const Genders = [
+  { value: 'women' as const, label: 'Žene', param: 'zene' },
+  { value: 'men' as const, label: 'Muškarci', param: 'muskarci' },
+];
+
+const SizeKinds = [
+  { kind: 'letters' as const, title: 'Slovne' },
+  { kind: 'numbers' as const, title: 'Brojevi' },
+  { kind: 'other' as const, title: 'Ostale' },
+];
 
 const Sorts: { value: ProductSort; label: string }[] = [
   { value: 'preporuceno', label: 'Preporučeno' },
@@ -24,7 +38,7 @@ const Sorts: { value: ProductSort; label: string }[] = [
   { value: 'najnovije', label: 'Najnovije' },
 ];
 
-// Filters in the address: ?kategorija=Majice,Hlačice&boja=Crna&velicina=M&oznaka=trening&dostupno=1
+// Filters in the address: ?za=zene&kategorija=Majice,Hlačice&boja=Crna&velicina=M&oznaka=trening&cijena=10-50&dostupno=1
 const Params: Record<FacetName, string> = {
   categories: 'kategorija',
   colors: 'boja',
@@ -37,6 +51,14 @@ const FacetTitles: Record<FacetName, string> = {
   colors: 'Boja',
   sizes: 'Veličina',
   keywords: 'Ključne riječi',
+};
+
+const readStorage = (key: string) => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 };
 
 /**
@@ -60,6 +82,8 @@ export class HomeComponent {
   // Filters as a panel over the page on phones.
   readonly filtersOpen = signal(false);
   readonly allKeywords = signal(false);
+  // Filter column on wide screens, hidden to give the products the whole width.
+  readonly filtersHidden = signal(readStorage(FiltersHiddenKey) === '1');
 
   private readonly all = computed(() => this.products() ?? []);
 
@@ -67,13 +91,54 @@ export class HomeComponent {
   readonly colors = computed(() => facet(this.all(), this.filter(), 'colors')
     .map((x) => ({ ...x, background: swatchBackground(x.value) })));
   readonly sizes = computed(() => facet(this.all(), this.filter(), 'sizes'));
-  readonly keywords = computed(() => {
+  // Sizes in letters and in numbers apart, as the size guides have them.
+  readonly sizeGroups = computed(() => SizeKinds
+    .map((x) => ({ ...x, values: this.sizes().filter((size) => sizeKind(size.value) === x.kind) }))
+    .filter((x) => x.values.length > 0));
+
+  // Keywords in their groups (material, collection ...), each group a filter of its own.
+  readonly keywordGroups = computed(() => {
     const values = facet(this.all(), this.filter(), 'keywords');
     const picked = this.filter().keywords;
-    return this.allKeywords() ? values : values.filter((x, i) => i < KeywordsShown || picked.includes(x.value));
+    return KeywordGroups
+      .map((group) => {
+        const all = values.filter((x) => keywordGroup(x.value) === group.name)
+          .map((x) => ({ ...x, label: keywordValue(x.value) }));
+        const shown = this.allKeywords() ? all : all.filter((x, i) => i < KeywordsShown || picked.includes(x.value));
+        return { ...group, values: shown, more: all.length - shown.length };
+      })
+      .filter((x) => x.values.length > 0);
   });
-  readonly moreKeywords = computed(() =>
-    Math.max(0, facet(this.all(), emptyFilter(), 'keywords').length - KeywordsShown));
+
+  // Gender chips above the list, when products have a gender set.
+  readonly genders = computed(() =>
+    this.all().some((x) => x.gender === 'women' || x.gender === 'men' || x.gender === 'unisex') ? Genders : []);
+
+  // Lowest and highest price, as the placeholders of the price range.
+  readonly priceBounds = computed(() => {
+    const prices = this.all().map((x) => x.price);
+    return prices.length ? { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) } : null;
+  });
+
+  // "Shop / Žene / Majice" above the title.
+  readonly breadcrumbs = computed(() => {
+    const filter = this.filter();
+    const gender = Genders.find((x) => x.value === filter.gender);
+    const category = filter.categories.length === 1 ? filter.categories[0] : null;
+    const crumbs: { label: string; gender: string | null; category: string | null }[] = [];
+    if (gender) crumbs.push({ label: gender.label, gender: gender.value, category: null });
+    if (category) crumbs.push({ label: category, gender: gender?.value ?? null, category });
+    return crumbs;
+  });
+
+  // Pictures of the first products in stock, shown in the banner.
+  readonly bannerProducts = computed(() =>
+    this.all().filter((x) => x.imageIds.length && x.variants.some((v) => v.inStock)).slice(0, 3));
+
+  readonly title = computed(() => {
+    const crumbs = this.breadcrumbs();
+    return crumbs.length ? crumbs.map((x) => x.label).join(' · ') : 'Shop';
+  });
 
   readonly matching = computed(() => {
     const list = this.all().filter((product) => matches(product, this.filter()));
@@ -95,13 +160,19 @@ export class HomeComponent {
   readonly activeChips = computed(() => {
     const filter = this.filter();
     const chips = (Object.keys(Params) as FacetName[])
-      .flatMap((name) => filter[name].map((value) => ({ name, value, label: value })));
-    return filter.inStockOnly ? [...chips, { name: 'inStock' as const, value: '', label: 'Na zalihi' }] : chips;
+      .flatMap((name) => filter[name].map((value) => ({ name, value, label: name === 'keywords' ? keywordValue(value) : value })));
+    const extra: { name: 'inStock' | 'price'; value: string; label: string }[] = [];
+    if (filter.priceMin !== null || filter.priceMax !== null) {
+      extra.push({ name: 'price', value: '', label: this.priceLabel(filter) });
+    }
+    if (filter.inStockOnly) extra.push({ name: 'inStock', value: '', label: 'Na zalihi' });
+    return [...chips, ...extra];
   });
 
   // Filters shown at all: a shop with one category doesn't need the category filter.
   readonly hasFilters = computed(() =>
-    this.categories().length > 1 || this.colors().length > 1 || this.sizes().length > 1 || this.keywords().length > 0);
+    this.categories().length > 1 || this.colors().length > 1 || this.sizes().length > 1 || this.keywordGroups().length > 0 ||
+    (this.priceBounds()?.max ?? 0) > (this.priceBounds()?.min ?? 0));
 
   // Products the visitor opened before, newest first.
   readonly recent = computed(() => {
@@ -129,6 +200,8 @@ export class HomeComponent {
       sizes: list(Params.sizes),
       keywords: list(Params.keywords),
       inStockOnly: params.get('dostupno') === '1',
+      gender: Genders.find((x) => x.param === params.get('za'))?.value ?? null,
+      ...this.readPrice(params.get('cijena')),
     });
     const sort = params.get('sort') as ProductSort | null;
     if (sort && Sorts.some((x) => x.value === sort)) this.sort.set(sort);
@@ -178,9 +251,49 @@ export class HomeComponent {
     this.update({ ...this.filter(), inStockOnly: value });
   }
 
-  removeChip(chip: { name: FacetName | 'inStock'; value: string }): void {
+  removeChip(chip: { name: FacetName | 'inStock' | 'price'; value: string }): void {
     if (chip.name === 'inStock') this.setInStockOnly(false);
+    else if (chip.name === 'price') this.update({ ...this.filter(), priceMin: null, priceMax: null });
     else this.toggle(chip.name, chip.value);
+  }
+
+  // Women's or men's products, or all with null; picking the same one again shows all.
+  pickGender(gender: 'women' | 'men' | null): void {
+    this.update({ ...this.filter(), gender: this.filter().gender === gender ? null : gender });
+  }
+
+  // From the "od" and "do" fields; an empty field has no limit.
+  setPrice(which: 'priceMin' | 'priceMax', text: string): void {
+    const value = text.trim() === '' ? null : Number(text.replace(',', '.'));
+    if (value !== null && (Number.isNaN(value) || value < 0)) return;
+    if (this.filter()[which] === value) return;
+    this.update({ ...this.filter(), [which]: value });
+  }
+
+  // On wide screens hides or shows the filter column; on phones opens the filters panel.
+  toggleFilters(): void {
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      this.filtersHidden.update((x) => !x);
+      try {
+        localStorage.setItem(FiltersHiddenKey, this.filtersHidden() ? '1' : '0');
+      } catch {
+        // Not remembered, still works on this page.
+      }
+    } else {
+      this.filtersOpen.set(true);
+    }
+  }
+
+  private priceLabel(filter: CatalogFilter): string {
+    if (filter.priceMin !== null && filter.priceMax !== null) return `${filter.priceMin}–${filter.priceMax} €`;
+    return filter.priceMin !== null ? `od ${filter.priceMin} €` : `do ${filter.priceMax} €`;
+  }
+
+  // "10-50", "10-" or "-50".
+  private readPrice(text: string | null): Pick<CatalogFilter, 'priceMin' | 'priceMax'> {
+    const [min, max] = (text ?? '').split('-').map((x) => (x.trim() === '' ? null : Number(x)));
+    const valid = (x: number | null | undefined) => (x !== null && x !== undefined && !Number.isNaN(x) && x >= 0 ? x : null);
+    return { priceMin: valid(min), priceMax: valid(max) };
   }
 
   setSort(sort: ProductSort): void {
@@ -194,8 +307,9 @@ export class HomeComponent {
     this.updateAddress();
   }
 
+  // Keeps the search and the gender, which are not in the filter panel.
   clearFilters(): void {
-    this.update({ ...emptyFilter(), search: this.filter().search });
+    this.update({ ...emptyFilter(), search: this.filter().search, gender: this.filter().gender });
   }
 
   clearAll(): void {
@@ -215,10 +329,13 @@ export class HomeComponent {
     this.router.navigate([], {
       queryParams: {
         trazi: filter.search.trim() || null,
+        za: Genders.find((x) => x.value === filter.gender)?.param ?? null,
         [Params.categories]: join(filter.categories),
         [Params.colors]: join(filter.colors),
         [Params.sizes]: join(filter.sizes),
         [Params.keywords]: join(filter.keywords),
+        cijena: filter.priceMin !== null || filter.priceMax !== null
+          ? `${filter.priceMin ?? ''}-${filter.priceMax ?? ''}` : null,
         dostupno: filter.inStockOnly ? '1' : null,
         sort: this.sort() === 'preporuceno' ? null : this.sort(),
         prikazano: this.shown() > PageSize ? this.shown() : null,

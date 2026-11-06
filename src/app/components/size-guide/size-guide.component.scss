@@ -104,3 +104,23 @@ ul {
   background: var(--tint-soft);
   font-size: 14px;
 }
+
+// The guide is for body measurements, not the garment's.
+.body-note {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff4e5;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+// Sizes the product comes in.
+tr.own th,
+tr.own td {
+  background: #f4f6fc;
+}
+
+tr.own th {
+  color: var(--blue);
+}

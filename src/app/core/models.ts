@@ -23,7 +23,11 @@ export interface Product {
     keywords?: string[] | null;
     // Products picked in the administration to go with this one.
     relatedProductIds?: string[] | null;
+    // "women", "men" or "unisex"; null for products for everyone, like accessories.
+    gender?: Gender | null;
 }
+
+export type Gender = "women" | "men" | "unisex";
 
 export interface ShopSettings {
     shippingPrice: number;

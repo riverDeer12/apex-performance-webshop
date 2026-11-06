@@ -1,5 +1,6 @@
 import { Component, HostListener, computed, input, output } from '@angular/core';
-import { normalize } from '../../core/catalog';
+import { normalize, sizeKind } from '../../core/catalog';
+import { Gender } from '../../core/models';
 
 type Kind = 'tops' | 'bottoms' | 'shoes' | 'socks';
 
@@ -41,7 +42,17 @@ const Guides: Record<Kind, Guide> = {
   },
 };
 
-/** Size guide for the kind of product, as a dialog over the product page. */
+// EU number sizes of clothes next to the letters, for products sized in numbers.
+const NumberSizes: Record<'women' | 'men', Record<string, string>> = {
+  women: { XS: '34', S: '36', M: '38', L: '40', XL: '42', XXL: '44', '3XL': '46' },
+  men: { XS: '44', S: '46', M: '48', L: '50', XL: '52', XXL: '54', '3XL': '56' },
+};
+
+/**
+ * Size guide for the kind of product, as a dialog over the product page. Clothes
+ * sized in numbers (38, 40 ...) get the table in numbers, the others in letters;
+ * the product's own sizes are marked.
+ */
 @Component({
   selector: 'app-size-guide',
   templateUrl: './size-guide.component.html',
@@ -50,9 +61,32 @@ const Guides: Record<Kind, Guide> = {
 export class SizeGuideComponent {
   readonly category = input.required<string>();
   readonly name = input.required<string>();
+  // Sizes of the product, e.g. ["S", "M", "L"] or ["38", "40"].
+  readonly sizes = input<string[]>([]);
+  readonly gender = input<Gender | null>(null);
   readonly closed = output<void>();
 
-  readonly guide = computed(() => Guides[this.kind()]);
+  readonly guide = computed<Guide>(() => {
+    const guide = Guides[this.kind()];
+    if (this.kind() === 'shoes' || this.kind() === 'socks' || !this.inNumbers()) return guide;
+
+    // Unisex and unknown products in men's numbers, which are the bigger ones.
+    const numbers = NumberSizes[this.gender() === 'women' ? 'women' : 'men'];
+    return {
+      ...guide,
+      columns: [`Veličina (EU, ${this.gender() === 'women' ? 'žene' : 'muškarci'})`, ...guide.columns.slice(1), 'Slovna'],
+      rows: guide.rows.map(([letter, ...rest]) => [numbers[letter] ?? letter, ...rest, letter]),
+    };
+  });
+
+  // Products sized only in numbers.
+  readonly inNumbers = computed(() => this.sizes().length > 0 && this.sizes().every((x) => sizeKind(x) === 'numbers'));
+
+  // Row of the table that is one of the product's sizes.
+  isOwn(row: string[]): boolean {
+    const own = new Set(this.sizes().map((x) => normalize(x)));
+    return own.has(normalize(row[0])) || own.has(normalize(row[row.length - 1]));
+  }
 
   private readonly kind = computed<Kind>(() => {
     const text = normalize(`${this.category()} ${this.name()}`);
